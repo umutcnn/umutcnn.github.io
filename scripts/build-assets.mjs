@@ -1,6 +1,9 @@
 // Generates optimised static assets into public/.
 //  1. Profile photo  → public/profile/umut-can-yildiz-{320,640}.{avif,webp}
 //  2. Open Graph card → public/og-image.png (rendered from scripts/og-template.html with Playwright Chromium)
+//  3. App icons       → public/icons/icon-{192,512}.png, public/icons/apple-touch-icon.png (from public/favicon.svg)
+//
+// Run a subset with --only=photo,og,icons (default: all).
 //
 // Source photo: assets-src/profile.jpg (portrait supplied by the owner, 800×800). Fallback: the portrait extracted
 // from the CV with scripts/extract-photo.py into tests/.artifacts/profile-source.png.
@@ -56,5 +59,28 @@ async function buildOgImage() {
   }
 }
 
-await buildPhoto();
-await buildOgImage();
+async function buildIcons() {
+  const outDir = path.join(root, 'public/icons');
+  await mkdir(outDir, { recursive: true });
+  const svg = path.join(root, 'public/favicon.svg');
+  for (const [name, size] of [
+    ['icon-192.png', 192],
+    ['icon-512.png', 512],
+    ['apple-touch-icon.png', 180],
+  ]) {
+    await sharp(svg, { density: Math.ceil((72 * size) / 64) })
+      .resize(size, size)
+      .png({ compressionLevel: 9, palette: true })
+      .toFile(path.join(outDir, name));
+  }
+  console.log('icons: ok');
+}
+
+const only = process.argv
+  .find(a => a.startsWith('--only='))
+  ?.slice(7)
+  .split(',');
+const run = step => !only || only.includes(step);
+if (run('photo')) await buildPhoto();
+if (run('og')) await buildOgImage();
+if (run('icons')) await buildIcons();

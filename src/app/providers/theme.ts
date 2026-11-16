@@ -5,6 +5,13 @@ export type Theme = 'light' | 'dark';
 
 const listeners = new Set<() => void>();
 
+/** Browser UI colour per theme (`--bg` of the paper surface in tokens.css). */
+export const THEME_COLOR: Record<Theme, string> = { light: '#f5f4f0', dark: '#0d111b' };
+
+function applyThemeColor(theme: Theme) {
+  document.head.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
+}
+
 /**
  * First visit always opens in the light theme (owner's choice); dark only after the visitor picks it,
  * and that choice is remembered.
@@ -21,6 +28,7 @@ export function getTheme(): Theme {
 export function setTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme;
   document.documentElement.style.colorScheme = theme;
+  applyThemeColor(theme);
   storage.set(STORAGE_KEYS.theme, theme);
   listeners.forEach(l => l());
 }
@@ -39,4 +47,4 @@ export function useTheme(): Theme {
  * Inline script for index.html: applies the stored theme (default light) before first paint (no flash).
  * Kept in sync with resolveInitialTheme by the unit tests.
  */
-export const THEME_BOOT_SCRIPT = `(function(){try{var s=localStorage.getItem('${STORAGE_KEYS.theme}');var t=s==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.dataset.theme='light';}document.documentElement.classList.add('js');})();`;
+export const THEME_BOOT_SCRIPT = `(function(){try{var s=localStorage.getItem('${STORAGE_KEYS.theme}');var t=s==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;var m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'${THEME_COLOR.dark}':'${THEME_COLOR.light}';}catch(e){document.documentElement.dataset.theme='light';}document.documentElement.classList.add('js');})();`;

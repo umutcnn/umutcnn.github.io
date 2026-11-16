@@ -228,6 +228,26 @@ test.describe('Scenario G — stability', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Umut Can Yıldız' })).toBeVisible();
   });
 
+  test('"All projects" returns to the exact spot on the home page the case study was opened from', async ({ page }) => {
+    await page.goto('/');
+    // the active card (desktop pins the section and makes the other cards inert)
+    await page.locator('#work').scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 400);
+    const link = page.locator('#work .work-item:not([inert]) .work-item__title-link').first();
+    await link.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300); // let the scroll position be saved into history.state (debounced)
+    const before = await page.evaluate(() => window.scrollY);
+    expect(before).toBeGreaterThan(300);
+    await link.click();
+    await expect(page).toHaveURL(/\/work\/[a-z0-9-]+\/$/);
+    await page.getByTestId('case-back').click();
+    await expect(page).toHaveURL(/\/(#work)?$/);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before - 80);
+    expect(await page.evaluate(() => window.scrollY)).toBeLessThan(before + 80);
+    // history did not grow: one more "back" leaves the site's home entry (nothing to go back to in this test)
+    expect(await page.evaluate(() => history.length)).toBeLessThanOrEqual(3);
+  });
+
   test('navigating while a transition is running stays consistent', async ({ page }) => {
     await page.goto('/work/teknofest-2023-transportation-ai/');
     // two navigations back to back (the second cancels the first transition)

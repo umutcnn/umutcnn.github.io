@@ -80,7 +80,9 @@ export function flReducer(state: FlState, action: FlAction): FlState {
       return createFlState(action.algorithm, state.rounds);
     case 'setRounds': {
       const rounds = clampRounds(action.rounds);
-      return { ...state, rounds, round: Math.min(state.round, rounds) };
+      // Target reached (or passed): the round in flight must not complete, or the counter would read "3 / 2".
+      if (state.round >= rounds) return { ...state, rounds, round: rounds, phase: 'idle', playing: false };
+      return { ...state, rounds };
     }
   }
 }

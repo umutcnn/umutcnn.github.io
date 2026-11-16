@@ -27,6 +27,9 @@ const ITEMS: Item[] = [
   { kind: 'pad-blocked', x: 520, y: 270, w: 84, h: 84, conf: 0.89 },
 ];
 
+/** Scene x (of 640) beyond which a detection label would run past the right edge. */
+const LABEL_FLIP_X = 440;
+
 const LABEL: Record<Kind, { tr: string; en: string }> = {
   vehicle: { tr: 'taşıt', en: 'vehicle' },
   person: { tr: 'insan', en: 'person' },
@@ -86,7 +89,13 @@ export function AerialScene({ compact = false }: { compact?: boolean }) {
         {ITEMS.map((d, i) => (
           <g key={i} className={`aerial-det aerial-det--${d.kind}`} style={{ animationDelay: `${i * 120}ms` }}>
             <rect x={d.x - 4} y={d.y - 4} width={d.w + 8} height={d.h + 8} rx="3" />
-            <text x={d.x - 4} y={d.y - 8} className="aerial-det__text">
+            {/* labels of boxes in the right part of the scene are right-aligned so they stay inside the frame */}
+            <text
+              x={d.x + d.w / 2 > LABEL_FLIP_X ? d.x + d.w + 4 : d.x - 4}
+              y={d.y - 8}
+              textAnchor={d.x + d.w / 2 > LABEL_FLIP_X ? 'end' : undefined}
+              className="aerial-det__text"
+            >
               {LABEL[d.kind][locale]} {d.conf.toFixed(2)}
             </text>
           </g>

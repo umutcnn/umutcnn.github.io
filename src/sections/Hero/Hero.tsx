@@ -14,7 +14,7 @@ import './Hero.css';
 const SIGNAL_TARGETS: SectionId[] = ['work', 'research'];
 
 export function Hero() {
-  const { t, l, locale } = useLocale();
+  const { t, l } = useLocale();
   const goTo = useGoToSection();
   const root = useRef<HTMLElement>(null);
   const field = useRef<FieldController | null>(null);
@@ -83,7 +83,8 @@ export function Hero() {
         <div className="hero__instrument">
           <p className="label">{t.hero.kickerLeft}</p>
           <p className="label">
-            {upper(l(PROFILE.location), locale)} — {PROFILE.year}
+            {/* a Turkish place name: Turkish casing in every language (TÜRKİYE, not TÜRKIYE) */}
+            {upper(l(PROFILE.location), 'tr')} — {PROFILE.year}
           </p>
         </div>
 

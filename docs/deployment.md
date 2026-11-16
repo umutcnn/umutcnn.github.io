@@ -1,5 +1,9 @@
 # Deployment
 
+> **Superseded.** The site is live at https://umutcnn.github.io/ (repository `umutcnn/umutcnn.github.io`, deployed by
+> `.github/workflows/deploy.yml`). The pre-render head already prefixes favicon/manifest/font links with the base
+> path. Current state: [audit/V4_PRODUCTION_AUDIT.md](audit/V4_PRODUCTION_AUDIT.md).
+
 Nothing has been pushed or published. Choose one of the options below when ready.
 
 ## Local

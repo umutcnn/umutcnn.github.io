@@ -199,7 +199,6 @@
       color var(--dur-normal) var(--ease-out),
       border-color var(--dur-normal) var(--ease-out),
       box-shadow var(--dur-normal) var(--ease-out);
-    will-change: transform;
   }
   .btn:hover {
     box-shadow: 0 10px 30px -14px color-mix(in oklab, var(--fg) 60%, transparent);
@@ -390,10 +389,33 @@
     }
   }
 
-  /* ---------- reveal on scroll (only hides when JS is running; fail-safe after 3.5s) */
+  /* ---------- horizontal scroller edge fade (data attributes set by useOverflowFade) */
+  .scroll-fade {
+    --fade: 2.5rem;
+    scroll-snap-type: x proximity;
+  }
+  .scroll-fade > * {
+    scroll-snap-align: start;
+  }
+  .scroll-fade[data-more-end] {
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent);
+  }
+  .scroll-fade[data-more-start] {
+    mask-image: linear-gradient(to right, transparent, #000 var(--fade));
+  }
+  .scroll-fade[data-more-start][data-more-end] {
+    mask-image: linear-gradient(to right, transparent, #000 var(--fade), #000 calc(100% - var(--fade)), transparent);
+  }
+
+  /* ---------- reveal on scroll (only hides when JS is running)
+     Fail-safe: if the app has not hydrated within 3.5s (script blocked or failed), show everything. It is scoped to
+     :not([data-hydrated]) — after hydration the IntersectionObserver owns the reveal, otherwise the fail-safe would
+     reveal all below-the-fold content 3.5s after load and the scroll reveals would never play. */
   .js [data-reveal]:not(.is-in) {
     opacity: 0;
     transform: translate3d(0, 28px, 0);
+  }
+  .js:not([data-hydrated]) [data-reveal]:not(.is-in) {
     animation: reveal-failsafe 0s linear 3.5s forwards;
   }
   [data-reveal] {
@@ -424,6 +446,8 @@
   }
   .js .split:not(.is-in) .split-word > span {
     transform: translate3d(0, 105%, 0);
+  }
+  .js:not([data-hydrated]) .split:not(.is-in) .split-word > span {
     animation: reveal-failsafe 0s linear 3.5s forwards;
   }
 }
@@ -433,6 +457,8 @@
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
+    /* entrance animations use `backwards` fill: a kept delay would hold content in its hidden "from" state */
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     transition-delay: 0ms !important;

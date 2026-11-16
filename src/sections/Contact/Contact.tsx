@@ -16,9 +16,24 @@ export async function copyText(text: string): Promise<boolean> {
       return true;
     }
   } catch {
-    /* fall through */
+    /* fall through to the legacy path */
   }
-  return false;
+  // Older browsers and non-secure contexts (no Clipboard API): copy through a temporary off-screen textarea.
+  try {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+    const active = document.activeElement as HTMLElement | null;
+    document.body.appendChild(area);
+    area.select();
+    const ok = typeof document.execCommand === 'function' && document.execCommand('copy');
+    area.remove();
+    active?.focus({ preventScroll: true });
+    return ok;
+  } catch {
+    return false;
+  }
 }
 
 function Row({

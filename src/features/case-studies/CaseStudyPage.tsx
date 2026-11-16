@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Lock } from 'lucide-react';
 import { LazyMotion, MotionConfig, domAnimation } from 'motion/react';
 import type { ReactNode } from 'react';
 import { useLocale } from '../../app/providers/LocaleProvider';
-import { Link, useRouter } from '../../app/providers/RouterProvider';
+import { cameFrom, Link, useRouter } from '../../app/providers/RouterProvider';
 import { Reveal } from '../../components/motion/Reveal';
 import { ArchitectureGraph, PermissionMatrix } from '../../components/visualizations/ArchitectureGraph';
 import { ProjectVisual } from '../../components/visualizations/ProjectVisual';
@@ -42,7 +42,8 @@ export default function CaseStudyPage({ slug }: { slug: string }) {
   const project = findProjectBySlug(slug)!;
   const next = nextCaseStudy(slug);
   const related = relatedProjects(project).filter(p => p.hasCaseStudy);
-  const homeWork = `${hrefFor(locale, { name: 'home' })}#work`;
+  const homePath = hrefFor(locale, { name: 'home' });
+  const homeWork = `${homePath}#work`;
   const s = t.caseStudy.sections;
 
   const textSections: { key: SectionKey; value?: Localized<string[]> }[] = [
@@ -69,7 +70,19 @@ export default function CaseStudyPage({ slug }: { slug: string }) {
         <article className="case case--enter" aria-labelledby="case-title">
           <header className="case__hero tone-night grid-paper" data-nav-tone="night">
             <div className="container-x case__hero-inner">
-              <Link to={homeWork} className="case__back label" data-testid="case-back">
+              <Link
+                to={homeWork}
+                className="case__back label"
+                data-testid="case-back"
+                onClick={e => {
+                  // Opened from the home page: go back in history, which restores the exact scroll position (the
+                  // card the visitor clicked) instead of stacking a new entry and scrolling to the section top.
+                  if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && cameFrom(homePath)) {
+                    e.preventDefault();
+                    history.back();
+                  }
+                }}
+              >
                 <ArrowLeft size={14} aria-hidden="true" /> {t.caseStudy.back}
               </Link>
               <p className="label case__kicker">
@@ -122,7 +135,7 @@ export default function CaseStudyPage({ slug }: { slug: string }) {
             )}
           </header>
 
-          <div className="case__body tone-paper">
+          <div className="case__body tone-paper" data-nav-tone="paper">
             <div className="container-x">
               {project.disclosure && (
                 <p className="badge-note case__disclosure" role="note">
@@ -141,8 +154,8 @@ export default function CaseStudyPage({ slug }: { slug: string }) {
                   </h2>
                   <ul>
                     {project.metrics.map(mt => (
-                      <Reveal as="li" key={mt.value + mt.label.en} className="metric">
-                        <p className="metric__value">{mt.value}</p>
+                      <Reveal as="li" key={mt.label.en} className="metric">
+                        <p className="metric__value">{typeof mt.value === 'string' ? mt.value : l(mt.value)}</p>
                         <p className="metric__label">{l(mt.label)}</p>
                         <p className="metric__context">{l(mt.context)}</p>
                       </Reveal>
@@ -212,6 +225,7 @@ export default function CaseStudyPage({ slug }: { slug: string }) {
             <Link
               to={hrefFor(locale, { name: 'case', slug: next.slug })}
               className="case__next tone-night"
+              data-nav-tone="night"
               data-testid="case-next"
             >
               <span className="container-x case__next-inner">

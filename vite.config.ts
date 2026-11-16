@@ -15,6 +15,8 @@ export default defineConfig({
     cssCodeSplit: true,
     sourcemap: false,
     assetsInlineLimit: 2048,
+    // Read by scripts/prerender-routes.mjs to inline route-chunk CSS (then deleted from dist).
+    manifest: true,
   },
   test: {
     environment: 'jsdom',

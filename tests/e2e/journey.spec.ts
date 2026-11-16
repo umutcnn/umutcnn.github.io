@@ -24,7 +24,7 @@ test.describe('primary visitor journey', () => {
 
     // 6. Case study content
     await expect(page.getByRole('heading', { level: 1, name: 'Federe Öğrenme ile Katarakt Tespiti' })).toBeVisible();
-    await expect(page.getByText('≈96.25%')).toBeVisible();
+    await expect(page.getByText('≈ %96,25')).toBeVisible(); // TR number format
     await expect(page.getByRole('heading', { name: /Problem/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: /Sınırlar/ })).toBeVisible();
     await expect(page).toHaveTitle(/Federe Öğrenme ile Katarakt Tespiti — Vaka Çalışması/);
@@ -189,6 +189,23 @@ test.describe('regressions from code review', () => {
       });
       expect(opacity, path).toBe(1);
     }
+    await context.close();
+  });
+
+  test('case studies are styled before any script runs (route CSS is inlined, no FOUC)', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto('/work/federated-cataract-detection/');
+    const styles = await page.locator('.case__title').evaluate(el => {
+      const hero = el.closest('.case__hero')!;
+      return {
+        size: parseFloat(getComputedStyle(el).fontSize),
+        heroPad: parseFloat(getComputedStyle(hero).paddingTop),
+      };
+    });
+    // CaseStudy.css sets a display-size title and a padded night hero; unstyled the title is 17px with no padding
+    expect(styles.size).toBeGreaterThan(30);
+    expect(styles.heroPad).toBeGreaterThan(0);
     await context.close();
   });
 

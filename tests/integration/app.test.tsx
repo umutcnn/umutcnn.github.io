@@ -171,4 +171,24 @@ describe('routing', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.getByTestId('gallery-open-0')).toHaveFocus();
   });
+
+  it('leaves arrow keys to interactive controls inside the gallery viewer', async () => {
+    const user = userEvent.setup();
+    renderAt('/work/federated-cataract-detection/');
+    await screen.findByRole('heading', { level: 1, name: /Katarakt/ });
+    await user.click(screen.getByTestId('gallery-open-0'));
+    const dialog = await screen.findByRole('dialog');
+    const counter = within(dialog).getByTestId('lightbox-counter');
+    const before = counter.textContent;
+    const radio = (await within(dialog).findAllByRole('radio')).find(r => (r as HTMLInputElement).checked)!;
+    radio.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(counter.textContent).toBe(before);
+    // outside a control the arrows still page through the gallery
+    within(dialog)
+      .getByRole('button', { name: /Kapat|Close/ })
+      .focus();
+    await user.keyboard('{ArrowRight}');
+    expect(counter.textContent).not.toBe(before);
+  });
 });

@@ -3,9 +3,22 @@ import { useEffect, useRef, type RefObject } from 'react';
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/**
+ * Tab stops in DOM order. A radio group is a single tab stop (its checked radio, or its first radio when none is
+ * checked): listing every radio would make the "last element" check miss and let Tab leave the dialog.
+ */
 function focusables(root: HTMLElement): HTMLElement[] {
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+  const all = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
     el => !el.hasAttribute('inert') && el.getClientRects().length > 0,
+  );
+  const radioStop = new Map<string, HTMLInputElement>();
+  for (const el of all) {
+    if (!(el instanceof HTMLInputElement) || el.type !== 'radio' || !el.name) continue;
+    const stop = radioStop.get(el.name);
+    if (!stop || (el.checked && !stop.checked)) radioStop.set(el.name, el);
+  }
+  return all.filter(
+    el => !(el instanceof HTMLInputElement && el.type === 'radio' && el.name) || radioStop.get(el.name) === el,
   );
 }
 

@@ -32,6 +32,7 @@
   letter-spacing: -0.04em;
   line-height: 1.05;
   overflow-wrap: anywhere;
+  padding-block: 0.15em; /* keeps the tap target >= 24px tall at the smallest size */
   background: linear-gradient(var(--c-signal), var(--c-signal)) 0 92% / 0 0.12em no-repeat;
   transition: background-size var(--dur-emphasis) var(--ease-out);
 }

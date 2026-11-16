@@ -62,7 +62,7 @@ export const AWARDS: Award[] = [
     rank: { tr: '3 kategoride finalist', en: 'Finalist in 3 categories' },
     summary: {
       tr: 'Sağlıkta Yapay Zekâ, Ulaşımda Yapay Zekâ ve Robotaksi Binek Otonom Araç kategorilerinin tamamında finalist takım üyesi.',
-      en: 'Finalist team member in all three of Health AI, AI in Transportation and Robotaxi autonomous vehicle categories.',
+      en: 'Finalist team member in all three of AI in Healthcare, AI in Transportation and Robotaxi autonomous vehicle categories.',
     },
     details: {
       tr: [

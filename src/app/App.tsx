@@ -23,6 +23,9 @@ import { ToastProvider } from './providers/ToastProvider';
 
 export type CaseStudyComponent = ComponentType<{ slug: string }>;
 
+/** Must match the `reveal-failsafe` animation delay in globals.css. */
+const REVEAL_FAILSAFE_MS = 3500;
+
 /** Code-split route chunk for client-side navigation. */
 const LazyCaseStudyPage = lazy(loadCaseStudyPage);
 /**
@@ -83,9 +86,16 @@ function AppShell() {
     applyRouteMeta(getRouteMeta(locale, route));
   }, [locale, route]);
 
-  // Hydration marker (tests and diagnostics wait for it; the entry script loads after first paint).
+  // Hydration marker (tests and diagnostics wait for it; the entry script loads after first paint). It also ends the
+  // CSS reveal fail-safe (globals.css). If hydration came late and the fail-safe already showed the content on
+  // screen, keep that content shown instead of hiding it for a frame and replaying its reveal.
   useEffect(() => {
-    document.documentElement.dataset.hydrated = '1';
+    const root = document.documentElement;
+    if (performance.now() >= REVEAL_FAILSAFE_MS) {
+      for (const el of document.querySelectorAll('[data-reveal]:not(.is-in), .split:not(.is-in)'))
+        if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('is-in');
+    }
+    root.dataset.hydrated = '1';
   }, []);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ export function Footer() {
   const { t } = useLocale();
   const goTo = useGoToSection();
   return (
-    <footer className="site-footer tone-night">
+    <footer className="site-footer tone-night" data-nav-tone="night">
       <div className="container-x site-footer__inner">
         <p className="label">
           © {PROFILE.year} {PROFILE.name}. {t.footer.rights}

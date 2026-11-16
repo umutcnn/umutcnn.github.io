@@ -4,6 +4,7 @@ import { useLocale } from '../../app/providers/LocaleProvider';
 import { Link, useRouter } from '../../app/providers/RouterProvider';
 import { Reveal } from '../../components/motion/Reveal';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { useOverflowFade } from '../../hooks/useOverflowFade';
 import { AWARDS } from '../../content/awards';
 import { findProjectBySlug } from '../../content/projects';
 import './Achievements.css';
@@ -78,6 +79,7 @@ export function Achievements() {
   const { t, l } = useLocale();
   const { locale, hrefFor } = useRouter();
   const [index, setIndex] = useState(0);
+  const strip = useOverflowFade<HTMLDivElement>(index);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const a = AWARDS[index]!;
   const project = a.projectSlug ? findProjectBySlug(a.projectSlug) : undefined;
@@ -114,7 +116,7 @@ export function Achievements() {
         />
 
         <Reveal className="story">
-          <div className="story__tabs" role="tablist" aria-label={t.achievements.label}>
+          <div ref={strip} className="story__tabs scroll-fade" role="tablist" aria-label={t.achievements.label}>
             {AWARDS.map((m, i) => (
               <button
                 key={m.id}
