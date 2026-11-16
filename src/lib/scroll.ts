@@ -8,10 +8,26 @@ import { afterFirstInteraction, loadGsap } from './gsap';
  * stays in sync.
  */
 let lenis: Lenis | null = null;
+/** Settles once a pending Lenis initialisation has finished (or failed); null when none is in flight. */
+let lenisSettling: Promise<void> | null = null;
 let lockCount = 0;
 
-export async function initSmoothScroll(): Promise<() => void> {
-  if (typeof window === 'undefined' || lenis || prefersReducedMotion() || !hasFinePointer()) return () => {};
+export function initSmoothScroll(): Promise<() => void> {
+  if (typeof window === 'undefined' || lenis || prefersReducedMotion() || !hasFinePointer())
+    return Promise.resolve(() => {});
+  const run = createSmoothScroll();
+  const settling = run.then(
+    () => {},
+    () => {},
+  );
+  lenisSettling = settling;
+  void settling.then(() => {
+    if (lenisSettling === settling) lenisSettling = null;
+  });
+  return run;
+}
+
+async function createSmoothScroll(): Promise<() => void> {
   await afterFirstInteraction();
   if (lenis) return () => {};
   const [{ default: LenisCtor }, { gsap, ScrollTrigger }] = await Promise.all([import('lenis'), loadGsap()]);
@@ -34,6 +50,13 @@ export function scrollToElement(el: HTMLElement | null, opts: { immediate?: bool
   const immediate = opts.immediate || prefersReducedMotion();
   if (lenis) {
     lenis.scrollTo(el, { immediate, duration: 1.1 });
+    return;
+  }
+  if (lenisSettling && !immediate) {
+    // Lenis and GSAP load on the first interaction, which is often the very click that asked for this scroll.
+    // A native smooth scroll started now would be cancelled by ScrollTrigger.refresh(), which restores the
+    // scroll position with an instant scrollTo — so wait for the smooth scroller (or its failure) instead.
+    void lenisSettling.then(() => scrollToElement(el, opts));
     return;
   }
   el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth', block: 'start' });

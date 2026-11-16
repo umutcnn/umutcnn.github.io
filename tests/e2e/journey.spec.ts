@@ -208,6 +208,17 @@ test.describe('regressions from code review', () => {
     await expect(page).toHaveURL(/\/en\/#achievements$/);
   });
 
+  test('a nav click that is also the first interaction still reaches its section', async ({ page }) => {
+    // On a busy machine the browser never reports idle, so the click itself opens the gate that loads GSAP and
+    // Lenis. ScrollTrigger.refresh() used to cancel the native smooth scroll the click had just started (CI flake).
+    await page.addInitScript(() => {
+      window.requestIdleCallback = () => 0;
+    });
+    await page.goto('/');
+    await navigateToSection(page, /Hakkımda/);
+    await expect(page.locator('#about')).toBeInViewport({ ratio: 0.1 });
+  });
+
   test('scroll position survives a reload', async ({ page }) => {
     await page.goto('/');
     await page.locator('#research').scrollIntoViewIfNeeded();

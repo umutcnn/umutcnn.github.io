@@ -4,6 +4,11 @@
 
 **AI Engineer · Computer Vision · Machine Learning · Intelligent Systems**
 
+[![Live site](https://img.shields.io/badge/live-umutcnn.github.io-0a0a0a?style=for-the-badge)](https://umutcnn.github.io/)
+[![Deploy to GitHub Pages](https://github.com/umutcnn/umutcnn.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/umutcnn/umutcnn.github.io/actions/workflows/deploy.yml)
+
+🌐 **Live:** [https://umutcnn.github.io/](https://umutcnn.github.io/) · 🇬🇧 [English](https://umutcnn.github.io/en/)
+
 A modern, bilingual (TR/EN), performance-oriented personal portfolio showcasing the engineering work, research, and technical projects of **Umut Can Yıldız**, a Computer Engineering graduate focused on building intelligent systems that solve real-world problems.
 
 The portfolio brings together artificial intelligence research, computer vision, autonomous systems, industrial automation, and enterprise software development through interactive storytelling, immersive case studies, and carefully engineered motion design.
@@ -129,12 +134,10 @@ Python is required only for the font-subsetting utility.
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/umutcan-portfolio.git
+git clone https://github.com/umutcnn/umutcnn.github.io.git
 
-cd umutcan-portfolio
+cd umutcnn.github.io
 ```
-
-Replace `YOUR_USERNAME` with the actual GitHub username.
 
 Install dependencies:
 
@@ -429,19 +432,17 @@ The application generates a statically deployable build and is suitable for host
 
 ### GitHub Pages
 
-The deployment process should include:
+The site is published at **[https://umutcnn.github.io/](https://umutcnn.github.io/)** from the
+`umutcnn/umutcnn.github.io` repository (a GitHub Pages *user site*, served from the root path `/`).
 
-1. Production build generation.
-2. Static asset publication.
-3. Correct Vite `base` configuration.
-4. Routing and direct-navigation validation.
-5. Verification of the published website.
+1. Repository name: **`umutcnn.github.io`** (public). Any other name is served under `/<name>/` instead.
+2. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+3. Push to `main`. [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) type-checks, lints, runs the
+   unit, integration, E2E and accessibility tests, builds with the base path derived from the repository name
+   (`/` for `umutcnn.github.io`), verifies the output and deploys.
 
-For a repository named `umutcan-portfolio`, the expected GitHub Pages URL format is:
-
-`https://YOUR_USERNAME.github.io/umutcan-portfolio/`
-
-The exact address depends on the GitHub username and repository configuration.
+Every route is pre-rendered to its own `index.html`, so deep links such as `/en/` or `/work/<slug>/` work on
+refresh; unknown paths fall back to `404.html`.
 
 ### Other Static Hosting Providers
 

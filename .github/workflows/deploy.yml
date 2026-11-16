@@ -1,8 +1,8 @@
 # Builds, tests and deploys the portfolio to GitHub Pages.
 #
-# Repository: umutcnn/umutcnn  →  published at https://umutcnn.github.io/umutcnn/
-# The base path is derived from the repository name, so the same file also works for a user-site repository
-# named `umutcnn.github.io` (base "/") or any other name (base "/<name>/").
+# Repository: umutcnn/umutcnn.github.io  →  published at https://umutcnn.github.io/ (user site, base "/").
+# The base path is derived from the repository name, so the same file also works under any other repository
+# name (base "/<name>/", e.g. umutcnn/umutcnn → https://umutcnn.github.io/umutcnn/).
 #
 # One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
 # The repository root must be this project folder (the one containing package.json).
