@@ -45,7 +45,9 @@ function Portrait() {
           />
         </picture>
       </div>
-      <figcaption className="label portrait__caption">FIG. 01 — {PROFILE.name.toLocaleUpperCase('tr-TR')}</figcaption>
+      <figcaption className="label portrait__caption">
+        {t.about.figure} — {PROFILE.name.toLocaleUpperCase('tr-TR')}
+      </figcaption>
     </figure>
   );
 }
@@ -130,7 +132,7 @@ export function About() {
             <Reveal key={f.label.en} className="fact" index={i}>
               <dt className="fact__label">{l(f.label)}</dt>
               <dd className="fact__value">
-                <Counter value={f.value} suffix={f.suffix} />
+                <Counter value={f.value} suffix={f.suffix && l(f.suffix)} />
               </dd>
             </Reveal>
           ))}

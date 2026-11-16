@@ -13,6 +13,7 @@ export interface RouteMeta {
   canonical: string | null;
   alternates: { hreflang: string; href: string }[];
   ogImage: string;
+  ogImageAlt: string;
   ogLocale: string;
   ogType: 'website' | 'article';
   robots: string;
@@ -26,6 +27,16 @@ const path = (locale: Locale, route: Route) => buildPath(locale, route, BASE);
 
 function abs(pathname: string): string {
   return `${SITE}${pathname}`;
+}
+
+/** Search engines show ~155–160 characters; longer text is cut at the last word boundary and ends with "…". */
+export const DESCRIPTION_MAX = 160;
+export function truncateAtWord(text: string, max = DESCRIPTION_MAX): string {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= max) return clean;
+  const cut = clean.slice(0, max); // room for the ellipsis: the trimmed part below is always shorter than `max`
+  const end = cut.search(/[\s,;:]+\S*$/);
+  return `${(end > 0 ? cut.slice(0, end) : cut.slice(0, max - 1)).replace(/[\s,;:.]+$/, '')}…`;
 }
 
 /** Resolves a route; unknown case slugs or projects without a case study resolve to 404. */
@@ -75,6 +86,7 @@ export function getRouteMeta(locale: Locale, rawRoute: Route): RouteMeta {
   const base = {
     lang: locale,
     ogImage: abs(`${BASE}og-image.png`),
+    ogImageAlt: d.meta.ogImageAlt,
     ogLocale: d.meta.ogLocale,
   };
 
@@ -100,7 +112,7 @@ export function getRouteMeta(locale: Locale, rawRoute: Route): RouteMeta {
     return {
       ...base,
       title: d.meta.caseTitle(title),
-      description: `${pick(p.subtitle, locale)}. ${pick(p.overview, locale)}`.slice(0, 300),
+      description: truncateAtWord(`${pick(p.subtitle, locale)}. ${pick(p.overview, locale)}`),
       canonical: abs(path(locale, route)),
       alternates,
       ogType: 'article',
@@ -133,19 +145,58 @@ export function getRouteMeta(locale: Locale, rawRoute: Route): RouteMeta {
 
 /** Client-side head sync after in-app navigation (the static HTML already carries the initial tags). */
 export function applyRouteMeta(meta: RouteMeta): void {
+  const head = document.head;
   document.title = meta.title;
   document.documentElement.lang = meta.lang;
-  const set = (selector: string, attr: string, value: string | null) => {
-    const el = document.head.querySelector(selector);
-    if (el && value !== null) el.setAttribute(attr, value);
+  // Upsert or remove one tag. Mirrors headFor() in scripts/prerender-routes.mjs.
+  const meta_ = (key: 'name' | 'property', id: string, value: string | null) => {
+    let el = head.querySelector(`meta[${key}="${id}"]`);
+    if (value === null) return el?.remove();
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute(key, id);
+      head.appendChild(el);
+    }
+    el.setAttribute('content', value);
   };
-  set('meta[name="description"]', 'content', meta.description);
-  set('meta[property="og:title"]', 'content', meta.title);
-  set('meta[property="og:description"]', 'content', meta.description);
-  set('meta[property="og:locale"]', 'content', meta.ogLocale);
-  set('meta[name="robots"]', 'content', meta.robots);
-  if (meta.canonical) {
-    set('link[rel="canonical"]', 'href', meta.canonical);
-    set('meta[property="og:url"]', 'content', meta.canonical);
+  meta_('name', 'description', meta.description);
+  meta_('name', 'robots', meta.robots);
+  meta_('property', 'og:type', meta.ogType);
+  meta_('property', 'og:title', meta.title);
+  meta_('property', 'og:description', meta.description);
+  meta_('property', 'og:locale', meta.ogLocale);
+  meta_('property', 'og:image', meta.ogImage);
+  meta_('property', 'og:image:alt', meta.ogImageAlt);
+  meta_('property', 'og:url', meta.canonical);
+  meta_('name', 'twitter:title', meta.title);
+  meta_('name', 'twitter:description', meta.description);
+  meta_('name', 'twitter:image', meta.ogImage);
+
+  let canonical = head.querySelector('link[rel="canonical"]');
+  if (!meta.canonical) canonical?.remove();
+  else {
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', meta.canonical);
+  }
+
+  head.querySelectorAll('link[rel="alternate"][hreflang]').forEach(el => el.remove());
+  for (const alt of meta.alternates) {
+    const link = document.createElement('link');
+    link.rel = 'alternate';
+    link.hreflang = alt.hreflang;
+    link.href = alt.href;
+    head.appendChild(link);
+  }
+
+  head.querySelectorAll('script[type="application/ld+json"]').forEach(el => el.remove());
+  if (meta.jsonLd) {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(meta.jsonLd);
+    head.appendChild(script);
   }
 }

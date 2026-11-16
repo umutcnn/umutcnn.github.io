@@ -1,12 +1,13 @@
 /** Turkish UI dictionary — the source of truth for the dictionary shape (see `Dict`). */
 export const tr = {
   meta: {
-    title: 'Umut Can Yıldız | Yapay Zekâ Mühendisi & Bilgisayarlı Görü Geliştiricisi',
+    title: 'Umut Can Yıldız | Yapay Zekâ Mühendisi & Bilgisayarlı Görü',
     description:
-      'Umut Can Yıldız — Yapay Zekâ, Bilgisayarlı Görü, Federe Öğrenme ve Kurumsal Yazılım Mühendisliği alanlarında projeler geliştiren bilgisayar mühendisi.',
+      'Umut Can Yıldız’ın yapay zekâ mühendisliği, bilgisayarlı görü, federe öğrenme ve yazılım geliştirme projelerini keşfedin.',
     caseTitle: (project: string) => `${project} — Vaka Çalışması | Umut Can Yıldız`,
     notFoundTitle: 'Sayfa bulunamadı | Umut Can Yıldız',
     ogLocale: 'tr_TR',
+    ogImageAlt: 'Umut Can Yıldız — Yapay Zekâ Mühendisi; portfolyo kartı',
   },
   a11y: {
     skip: 'İçeriğe geç',
@@ -74,6 +75,7 @@ export const tr = {
       },
     ],
     photoAlt: 'Umut Can Yıldız portresi',
+    figure: 'Şekil 01',
     educationLabel: 'Eğitim',
     focusLabel: 'Odak alanları',
     factsLabel: 'Rakamlarla',
@@ -174,7 +176,7 @@ export const tr = {
   },
   lab: {
     label: 'Etkileşimli Lab',
-    title: 'Geliştirdiğim Sistemlerin Arkasındaki Mantığı Keşfet.',
+    title: 'Geliştirdiğim Sistemlerin Arkasındaki Mantığı Keşfedin.',
     intro: 'Gerçek mühendislik kavramlarını deneyimleyebileceğiniz hafif, tarayıcıda çalışan modüller.',
     tabs: { fl: 'Federe Öğrenme', cv: 'Görüntü İşleme', arch: 'Mimari Gezgini' },
     tablistLabel: 'Lab modülleri',
@@ -309,7 +311,7 @@ export const tr = {
     counter: (i: number, n: number) => `${i} / ${n}`,
     permissionMatrix: 'Yetki matrisi — kavramsal',
     permissionRoles: ['Yönetici', 'Mühendis', 'Satış', 'İzleyici'],
-    permissionActions: ['Teklif oluştur', 'Hesabı düzenle', 'Onayla', 'Revizyon gör'],
+    permissionActions: ['Teklif oluştur', 'Hesaplamayı düzenle', 'Onayla', 'Revizyon gör'],
     allowed: 'izinli',
     denied: 'izinsiz',
   },

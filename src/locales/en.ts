@@ -3,12 +3,13 @@ import type { Dict } from './tr';
 /** English UI dictionary. Typed as `Dict`, so a missing key is a compile error. */
 export const en: Dict = {
   meta: {
-    title: 'Umut Can Yıldız | AI Engineer & Computer Vision Developer',
+    title: 'Umut Can Yıldız | AI Engineer & Computer Vision',
     description:
-      'Umut Can Yıldız — a computer engineer building projects in Artificial Intelligence, Computer Vision, Federated Learning and Enterprise Software Engineering.',
+      'Explore the AI engineering, computer vision, federated learning, and software development projects of Umut Can Yıldız.',
     caseTitle: (project: string) => `${project} — Case Study | Umut Can Yıldız`,
     notFoundTitle: 'Page not found | Umut Can Yıldız',
     ogLocale: 'en_US',
+    ogImageAlt: 'Umut Can Yıldız — AI Engineer; portfolio card',
   },
   a11y: {
     skip: 'Skip to content',
@@ -76,6 +77,7 @@ export const en: Dict = {
       },
     ],
     photoAlt: 'Portrait of Umut Can Yıldız',
+    figure: 'Fig. 01',
     educationLabel: 'Education',
     focusLabel: 'Focus areas',
     factsLabel: 'In numbers',
@@ -231,7 +233,7 @@ export const en: Dict = {
     },
     cv: {
       badge: 'Visualisation demo — no real model inference, the scene is synthetic',
-      title: 'Sample Detection Visualization',
+      title: 'Sample Detection Visualisation',
       options: 'Display options',
       showLabels: 'Class labels',
       showScores: 'Confidence scores',

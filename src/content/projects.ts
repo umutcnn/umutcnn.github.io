@@ -130,7 +130,7 @@ export const PROJECTS: Project[] = [
     },
     metrics: [
       {
-        value: '≈96.25%',
+        value: { tr: '≈ %96,25', en: '≈96.25%' },
         label: {
           tr: 'Sınıflandırma başarımı · FedProx · 3 istemci',
           en: 'Classification accuracy · FedProx · 3 clients',
@@ -213,7 +213,7 @@ export const PROJECTS: Project[] = [
       ],
       en: [
         'An object detection model was trained for vehicle, person and landing-area classes.',
-        'The model was evaluated on day, night and adverse-weather samples to make it robust across environments.',
+        'The model was evaluated on day, night and adverse-weather samples, aiming for robustness across environments.',
         'Detected landing areas were assessed as usable / not usable depending on objects found on them.',
       ],
     },
@@ -419,6 +419,17 @@ export const PROJECTS: Project[] = [
         'Impact stated in the CV: automating BOM extraction, equivalent-product matching and quote comparison cut quote evaluation time by 45% and costs by 20%.',
       ],
     },
+    // Limits restate only what is already disclosed above (source of the figures, confidentiality).
+    limitations: {
+      tr: [
+        '−%45 ve −%20 değerleri tek bir kurumdaki iç ölçümlerdir; bağımsız olarak doğrulanmadı ve başka iş akışlarına genellenemez.',
+        'Ticari gizlilik nedeniyle kaynak kod, ekran görüntüleri ve müşteri verileri yayımlanmaz; sayfadaki model ve diyagramlar temsilîdir.',
+      ],
+      en: [
+        'The −45% and −20% figures are internal measurements at a single company; they were not independently verified and do not generalise to other workflows.',
+        'Because the project is commercial, source code, screenshots and customer data are not published; the model and diagrams on this page are representative.',
+      ],
+    },
     learnings: {
       tr: [
         'Endüstriyel yazılımda doğruluk, hızdan önce gelir; her otomasyon adımı mühendisin doğrulayabileceği şekilde görünür olmalıdır.',
@@ -429,7 +440,7 @@ export const PROJECTS: Project[] = [
     },
     metrics: [
       {
-        value: '−45%',
+        value: { tr: '−%45', en: '−45%' },
         label: { tr: 'Teklif değerlendirme süresi', en: 'Quote evaluation time' },
         context: {
           tr: 'Özgeçmişte belirtilen kurum içi ölçüm; BOM çıkarımı + eşleştirme + teklif karşılaştırma otomasyonunun toplam etkisi.',
@@ -437,7 +448,7 @@ export const PROJECTS: Project[] = [
         },
       },
       {
-        value: '−20%',
+        value: { tr: '−%20', en: '−20%' },
         label: { tr: 'Maliyet', en: 'Cost' },
         context: {
           tr: 'Özgeçmişte belirtilen kurum içi ölçüm; aynı otomasyon kapsamı.',
@@ -648,7 +659,7 @@ export const PROJECTS: Project[] = [
     },
     metrics: [
       {
-        value: '≈98.4%',
+        value: { tr: '≈ %98,4', en: '≈98.4%' },
         label: { tr: 'mAP@50 · YOLOv9', en: 'mAP@50 · YOLOv9' },
         context: {
           tr: 'Tek kayıtlı deney, kurum içi doğrulama seti.',
@@ -656,12 +667,12 @@ export const PROJECTS: Project[] = [
         },
       },
       {
-        value: '≈78.0%',
+        value: { tr: '≈ %78,0', en: '≈78.0%' },
         label: { tr: 'mAP@50:95 · YOLOv9', en: 'mAP@50:95 · YOLOv9' },
         context: { tr: 'Aynı deney.', en: 'Same experiment.' },
       },
       {
-        value: '2–3 s',
+        value: { tr: '2–3 sn', en: '2–3 s' },
         label: { tr: 'Mobil sayım süresi', en: 'Mobile counting time' },
         context: { tr: 'Özgeçmişte belirtilen değer.', en: 'Value stated in the CV.' },
       },

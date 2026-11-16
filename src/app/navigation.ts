@@ -25,13 +25,17 @@ export function sectionLabel(t: Dict, id: SectionId): string {
 
 /** While a navigation-triggered scroll runs, the navbar must not auto-hide. */
 export const navScrollLock = { until: 0 };
+/** Keeps the navbar from auto-hiding while a programmatic smooth scroll is running. */
+export function holdNavDuringScroll(ms = 1800): void {
+  navScrollLock.until = performance.now() + ms;
+}
 
 /** Navigate to a home-page section from anywhere (keeps URL hash in sync without polluting history). */
 export function useGoToSection() {
   const { route, locale, hrefFor, navigate } = useRouter();
   return useCallback(
     (id: SectionId) => {
-      navScrollLock.until = performance.now() + 1800;
+      holdNavDuringScroll();
       const home = hrefFor(locale, { name: 'home' });
       if (route.name === 'home') {
         const target = id === 'home' ? home : `${home}#${id}`;
@@ -67,8 +71,9 @@ export function useActiveSection(enabled: boolean): SectionId | null {
 }
 
 /** Light/dark tone of the section under the navbar, so the bar always keeps its contrast. */
-export function useNavTone(dep: unknown): 'paper' | 'night' {
-  const [tone, setTone] = useState<'paper' | 'night'>('paper');
+export function useNavTone(dep: unknown, initial: 'paper' | 'night' = 'paper'): 'paper' | 'night' {
+  // `initial` is what the page starts with under the bar; it is also what the pre-rendered HTML shows before JS runs.
+  const [tone, setTone] = useState<'paper' | 'night'>(initial);
   useEffect(() => {
     if (typeof IntersectionObserver === 'undefined') return;
     const els = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-tone]'));

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { THEME_BOOT_SCRIPT, getTheme, resolveInitialTheme, setTheme } from '../../src/app/providers/theme';
+import { THEME_BOOT_SCRIPT, THEME_COLOR, getTheme, resolveInitialTheme, setTheme } from '../../src/app/providers/theme';
 import {
   SCENE_W,
   countByClass,
@@ -43,6 +43,18 @@ describe('theme', () => {
     expect(getTheme()).toBe('dark');
     expect(document.documentElement.dataset.theme).toBe('dark');
     expect(localStorage.getItem(STORAGE_KEYS.theme)).toBe('dark');
+  });
+
+  it('keeps the browser UI colour (<meta name="theme-color">) in step with the theme', () => {
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = THEME_COLOR.light;
+    document.head.appendChild(meta);
+    setTheme('dark');
+    expect(meta.content).toBe(THEME_COLOR.dark);
+    setTheme('light');
+    expect(meta.content).toBe(THEME_COLOR.light);
+    meta.remove();
   });
 
   it('ships the same no-flash boot script in index.html', () => {
@@ -94,6 +106,26 @@ describe('federated-learning visualiser state', () => {
     expect(flReducer(done, { type: 'play' })).toMatchObject({ round: 0, playing: true });
     expect(flReducer(done, { type: 'setRounds', rounds: 3 })).toMatchObject({ rounds: 3, round: 1 });
     expect(flReducer({ ...done, round: 5, rounds: 6 }, { type: 'setRounds', rounds: 2 }).round).toBe(2);
+  });
+
+  it('never shows more completed rounds than the target when rounds are lowered mid-round', () => {
+    // 2 rounds done, round 3 in flight; the visitor lowers the target to 2
+    let s = flReducer(
+      { ...createFlState('fedavg', 5), round: 2, phase: 'upload', playing: true },
+      { type: 'setRounds', rounds: 2 },
+    );
+    expect(s).toMatchObject({ rounds: 2, round: 2, phase: 'idle', playing: false });
+    for (let i = 0; i < 6; i++) {
+      s = flReducer(s, { type: 'tick' });
+      expect(s.round).toBeLessThanOrEqual(s.rounds);
+    }
+    // lowering the target above the completed count keeps the run going
+    expect(
+      flReducer(
+        { ...createFlState('fedavg', 5), round: 1, phase: 'train', playing: true },
+        { type: 'setRounds', rounds: 3 },
+      ),
+    ).toMatchObject({ rounds: 3, round: 1, phase: 'train', playing: true });
   });
 
   it('resets when the algorithm changes', () => {

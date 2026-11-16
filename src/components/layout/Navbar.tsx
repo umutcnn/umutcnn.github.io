@@ -4,6 +4,7 @@ import { PRIMARY_NAV, navScrollLock, useActiveSection, useGoToSection, useNavTon
 import { useLocale } from '../../app/providers/LocaleProvider';
 import { useRouter } from '../../app/providers/RouterProvider';
 import { PROFILE } from '../../content/profile';
+import { resolveRoute } from '../../lib/seo';
 import { LanguageToggle, ThemeToggle } from './Controls';
 import { MobileMenu } from './MobileMenu';
 import './Navbar.css';
@@ -14,7 +15,12 @@ export function Navbar() {
   const goTo = useGoToSection();
   const isHome = route.name === 'home';
   const active = useActiveSection(isHome);
-  const tone = useNavTone(`${route.name}-${locale}`);
+  // keyed on the slug too: case → case swaps the page DOM, so the observed elements must be re-queried
+  const tone = useNavTone(
+    `${route.name}-${route.name === 'case' ? route.slug : ''}-${locale}`,
+    // case studies and the 404 open on a night hero (resolveRoute: an unknown slug is a 404)
+    resolveRoute(route).name === 'home' ? 'paper' : 'night',
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -91,6 +97,19 @@ export function Navbar() {
           </nav>
 
           <div className="navbar__controls">
+            {/* recruiters: the CV one click away from every screen (mobile has it in the menu) */}
+            {PROFILE.cv.enabled && (
+              <a
+                className="navbar__cv"
+                href={`${import.meta.env.BASE_URL}${PROFILE.cv.href}`}
+                target="_blank"
+                rel="noopener"
+                data-testid="nav-cv"
+              >
+                {t.nav.cv}
+                <span className="sr-only"> {t.a11y.newTab}</span>
+              </a>
+            )}
             <LanguageToggle />
             <ThemeToggle />
             <button

@@ -1,5 +1,8 @@
 # V2 deployment guide
 
+> **Historical (V2).** The site has since been published from `umutcnn/umutcnn.github.io` at the domain root
+> (base `/`), not `/umutcnn/`. Current state: [audit/V4_PRODUCTION_AUDIT.md](audit/V4_PRODUCTION_AUDIT.md).
+
 Nothing has been pushed, deployed or connected to an external service. Everything below is prepared and tested
 locally (`npm run build && npm run preview`).
 

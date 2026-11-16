@@ -12,6 +12,8 @@ import { FEATURED_PROJECTS } from '../../content/projects';
 import { TECHS } from '../../content/skills';
 import { loadGsapDeferred } from '../../lib/gsap';
 import { hasFinePointer, prefersReducedMotion } from '../../lib/prefs';
+import { scrollToY } from '../../lib/scroll';
+import { holdNavDuringScroll } from '../../app/navigation';
 import type { Project } from '../../types/content';
 import { ProjectArchive } from './ProjectArchive';
 import './Work.css';
@@ -119,18 +121,25 @@ function WorkItem({
   );
 }
 
+const PIN_QUERY = '(min-width: 1024px) and (min-height: 640px)';
+const shouldPin = () => window.matchMedia(PIN_QUERY).matches && hasFinePointer() && !prefersReducedMotion();
+const isHydrated = () => typeof document !== 'undefined' && document.documentElement.dataset.hydrated === '1';
+
 export function Work() {
   const { t, l } = useLocale();
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLSpanElement>(null);
-  const [pinned, setPinned] = useState(false);
+  // Hydration must match the server markup (not pinned). After that — e.g. coming back from a case study — the
+  // layout is decided on the first render: starting unpinned would make the page ~5 viewports shorter and the
+  // restored scroll position would be clamped before the section grows.
+  const [pinned, setPinned] = useState(() => isHydrated() && shouldPin());
   const [active, setActive] = useState(0);
 
   // Pinned storytelling only for wide, fine-pointer screens without reduced motion; everything else scrolls natively.
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px) and (min-height: 640px)');
-    const update = () => setPinned(mq.matches && hasFinePointer() && !prefersReducedMotion());
+    const mq = window.matchMedia(PIN_QUERY);
+    const update = () => setPinned(shouldPin());
     update();
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
@@ -185,7 +194,9 @@ export function Work() {
     const top = track.getBoundingClientRect().top + window.scrollY;
     const span = track.offsetHeight - window.innerHeight;
     const y = top + ((i + 0.5) / N) * span;
-    window.scrollTo({ top: y, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    // same scroller and easing as section links, and keep the navbar from hiding during the jump
+    holdNavDuringScroll();
+    scrollToY(y, { smooth: true });
   };
 
   return (

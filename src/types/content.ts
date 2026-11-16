@@ -77,7 +77,8 @@ export type MediaItem =
   | { kind: 'image'; src: string; width: number; height: number; alt: Localized; caption: Localized };
 
 export interface Metric {
-  value: string;
+  /** Plain string when identical in every language (e.g. "#2"); localized for number formats (%96,25 vs 96.25%). */
+  value: string | Localized;
   label: Localized;
   /** Where the number comes from and its limits — always shown next to the value. */
   context: Localized;

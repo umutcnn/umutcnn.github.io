@@ -141,8 +141,13 @@ export function RouterProvider({ initialPath, children }: { initialPath?: string
     }
     if ('y' in intent) {
       // Restore now (so a view transition captures the right position) and once more after layout settles.
+      // The second pass is skipped if anything scrolled in between (the visitor already moved on): re-applying it
+      // would yank the page back down and auto-hide the navbar.
       scrollToY(intent.y);
-      requestAnimationFrame(() => scrollToY(intent.y));
+      const settled = window.scrollY;
+      requestAnimationFrame(() => {
+        if (window.scrollY === settled) scrollToY(intent.y);
+      });
       return;
     }
     requestAnimationFrame(() => {
@@ -157,8 +162,9 @@ export function RouterProvider({ initialPath, children }: { initialPath?: string
       const state = (history.state as Record<string, unknown> | null) ?? {};
       history.replaceState({ ...state, scrollY: window.scrollY }, '');
       const target = `${url.pathname}${url.search}${url.hash}`;
-      if (opts.replace) history.replaceState({ scrollY: window.scrollY }, '', target);
-      else history.pushState({ scrollY: 0 }, '', target);
+      if (opts.replace) history.replaceState({ scrollY: window.scrollY, from: state.from }, '', target);
+      // `from`: the page this entry was opened from, so "back" links can return there with history.back()
+      else history.pushState({ scrollY: 0, from: window.location.pathname }, '', target);
 
       const hash = url.hash.slice(1);
       let intent: ScrollIntent = opts.scroll ?? (hash ? { id: hash } : 'top');
@@ -178,6 +184,11 @@ export function useRouter(): RouterValue {
   const ctx = useContext(RouterContext);
   if (!ctx) throw new Error('useRouter must be used inside <RouterProvider>');
   return ctx;
+}
+
+/** True when the previous history entry is `pathname` inside this app (so history.back() returns there). */
+export function cameFrom(pathname: string): boolean {
+  return (history.state as { from?: unknown } | null)?.from === pathname;
 }
 
 function isPlainLeftClick(e: MouseEvent<HTMLAnchorElement>): boolean {

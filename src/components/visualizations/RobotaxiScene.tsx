@@ -44,7 +44,12 @@ export function RobotaxiScene({ compact = false }: { compact?: boolean }) {
   const [on, setOn] = useState<Record<Layer, boolean>>({ camera: true, lidar: true, detection: true, route: true });
 
   const svg = (
-    <svg className="taxi-svg" viewBox="0 0 640 380" role="img" aria-label={`${t.common.conceptual} — Robotaxi`}>
+    <svg
+      className="taxi-svg"
+      viewBox="0 0 640 380"
+      role="img"
+      aria-label={`${t.common.conceptual} — ${locale === 'tr' ? 'Robotaksi' : 'Robotaxi'}`}
+    >
       <defs>
         <linearGradient id={`${uid}-sky`} x1="0" x2="0" y1="0" y2="1">
           <stop offset="0" className="taxi-sky-top" />

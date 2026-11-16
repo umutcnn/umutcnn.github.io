@@ -2,7 +2,9 @@
   background:
     radial-gradient(60% 40% at 85% 0%, rgb(119 118 255 / 0.16), transparent 70%),
     radial-gradient(50% 30% at 0% 30%, rgb(164 255 112 / 0.06), transparent 70%), var(--bg);
-  will-change: clip-path;
+  /* no permanent will-change: the section is several viewports tall when pinned and would be kept as one huge
+     GPU layer; the clip-path tween only runs while the section enters the viewport */
+  isolation: isolate; /* same stacking context as before (will-change: clip-path created one) */
 }
 
 /* ---------------------------------------------------------------- stacked (default, mobile, reduced motion) */
@@ -373,12 +375,12 @@
   inset: 0;
   z-index: 4;
   border-radius: inherit;
-  cursor: none;
+  cursor: pointer;
 }
-@media (hover: none), (pointer: coarse) {
-  .work-item__hit {
-    cursor: pointer;
-  }
+/* the system cursor is hidden only while the custom "View case" label actually follows the pointer
+   (usePointerGlow adds .is-pointer; it is disabled for reduced motion and coarse pointers) */
+.work-item__visual.is-pointer .work-item__hit {
+  cursor: none;
 }
 /* contextual cursor hint: follows the pointer over the visual (coords from usePointerGlow) */
 .work-item__cursor {
@@ -427,7 +429,10 @@
 /* title displacement + category reveal */
 .work-item__title-link {
   display: inline;
-  transition: color var(--dur-normal) var(--ease-out);
+  /* keep the underline grow from the base rule: a lone `color` transition would override it */
+  transition:
+    color var(--dur-normal) var(--ease-out),
+    background-size var(--dur-emphasis) var(--ease-out);
 }
 .work-item__title {
   transition: transform var(--dur-emphasis) var(--ease-out);

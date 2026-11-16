@@ -4,6 +4,7 @@ import { useLocale } from '../../app/providers/LocaleProvider';
 import { Link, useRouter } from '../../app/providers/RouterProvider';
 import { Reveal } from '../../components/motion/Reveal';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { langTerm } from '../../components/ui/langTerm';
 import { DOMAINS, projectsForDomain } from '../../content/constellation';
 import { ARCHIVE_PROJECTS, FEATURED_PROJECTS } from '../../content/projects';
 import { projectsForTech } from '../../content/relations';
@@ -34,7 +35,7 @@ export function TechStack() {
     selection === null
       ? null
       : selection.kind === 'tech'
-        ? t.stack.usedIn(TECHS[selection.id].label)
+        ? langTerm(t.stack.usedIn(TECHS[selection.id].label), TECHS[selection.id].label, 'en')
         : t.stack.inDomain(l(DOMAINS.find(d => d.id === selection.id)!.title));
 
   return (

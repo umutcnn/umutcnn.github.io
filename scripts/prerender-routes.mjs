@@ -5,6 +5,7 @@
 //    dist/404.html (GitHub Pages fallback), sitemap.xml and robots.txt.
 // 4. Inlines the entry CSS and defers the entry script until after first paint (see bootScript).
 // Base-path aware: set VITE_BASE=/repo/ for a GitHub Pages project site (all URLs, files and data-route follow it).
+import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +15,6 @@ import { build } from 'vite';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const ssrOut = path.join(root, 'dist-ssr');
-const SITE_URL = 'https://umutcnn.github.io';
 const BASE = (() => {
   let b = process.env.VITE_BASE ?? '/';
   if (!b.startsWith('/')) b = `/${b}`;
@@ -48,11 +48,13 @@ function headFor(meta, fontPreload) {
     `<meta property="og:image" content="${meta.ogImage}" />`,
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(meta.ogImageAlt)}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${escapeHtml(meta.title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(meta.description)}" />`,
     `<meta name="twitter:image" content="${meta.ogImage}" />`,
     `<link rel="icon" href="${BASE}favicon.svg" type="image/svg+xml" />`,
+    `<link rel="apple-touch-icon" href="${BASE}icons/apple-touch-icon.png" />`,
     `<link rel="manifest" href="${BASE}site.webmanifest" />`,
   ];
   if (meta.canonical) {
@@ -69,9 +71,10 @@ function headFor(meta, fontPreload) {
   return tags.join('\n    ');
 }
 
-function fillTemplate(template, { html, meta, routePath, fontPreload }) {
+function fillTemplate(template, { html, meta, routePath, fontPreload, extraStyles = '' }) {
   const head = headFor(meta, fontPreload);
   const out = template
+    .replace('</head>', () => `${extraStyles}</head>`)
     // function replacers: `$&`, `$'` etc. inside rendered content must never be interpreted
     .replace(/<html lang="[^"]*"/, () => `<html lang="${meta.lang}"`)
     .replace(/<!--app-head-->[\s\S]*?<!--\/app-head-->/, () => head)
@@ -79,6 +82,23 @@ function fillTemplate(template, { html, meta, routePath, fontPreload }) {
   if (out.includes('<!--app-html-->') || out.includes('<!--app-head-->'))
     throw new Error(`template markers left in ${routePath}`);
   return out;
+}
+
+/**
+ * sitemap <lastmod>: date of the last commit that changed site content (not the build date, which would mark every
+ * URL as modified on each deploy). Falls back to today outside a git checkout.
+ */
+function contentDate() {
+  try {
+    const d = execFileSync('git', ['log', '-1', '--format=%cs', '--', 'src/content', 'src/locales', 'public'], {
+      cwd: root,
+      encoding: 'utf8',
+    }).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  } catch {
+    // not a git checkout
+  }
+  return new Date().toISOString().slice(0, 10);
 }
 
 async function main() {
@@ -90,18 +110,37 @@ async function main() {
     build: { ssr: path.join(root, 'src/entry-server.tsx'), outDir: ssrOut, emptyOutDir: true, copyPublicDir: false },
   });
   const ssrFile = (await readdir(ssrOut)).find(f => /^entry-server\.m?js$/.test(f));
-  const { listRoutes, renderPath } = await import(pathToFileURL(path.join(ssrOut, ssrFile)).href);
+  const { listRoutes, renderPath, SITE_URL } = await import(pathToFileURL(path.join(ssrOut, ssrFile)).href);
 
   let template = await readFile(path.join(dist, 'index.html'), 'utf8');
-  // Inline every stylesheet the entry needs (entry + shared chunks): no render-blocking CSS request on first visit.
-  for (const cssLink of [...template.matchAll(/<link rel="stylesheet"[^>]*href="([^"]*assets\/[^"]+\.css)"[^>]*>/g)]) {
-    const css = await readFile(path.join(dist, stripBase(cssLink[1])), 'utf8');
+  const inlineCss = async href => {
+    const css = await readFile(path.join(dist, stripBase(href)), 'utf8');
     const safeCss = css.replace(/<\/style/gi, '<\\/style'); // never let CSS text close the <style> element
-    template = template.replace(
-      cssLink[0],
-      () => `<style data-inline="${path.basename(cssLink[1])}">${safeCss}</style>`,
-    );
+    return `<style data-inline="${path.basename(href)}">${safeCss}</style>`;
+  };
+  // Inline every stylesheet the entry needs (entry + shared chunks): no render-blocking CSS request on first visit.
+  const inlined = new Set();
+  for (const cssLink of [...template.matchAll(/<link rel="stylesheet"[^>]*href="([^"]*assets\/[^"]+\.css)"[^>]*>/g)]) {
+    inlined.add(path.basename(cssLink[1]));
+    const tag = await inlineCss(cssLink[1]);
+    template = template.replace(cssLink[0], () => tag);
   }
+
+  // Case-study pages: the route chunk is lazy, so its CSS is not in index.html. Without inlining it the static
+  // page paints unstyled until the deferred entry script has loaded the chunk (FOUC on direct visits).
+  const manifestFile = path.join(dist, '.vite', 'manifest.json');
+  const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
+  const chunkCss = (key, seen = new Set()) => {
+    const chunk = manifest[key];
+    if (!chunk || seen.has(key)) return [];
+    seen.add(key);
+    return [...(chunk.imports ?? []).flatMap(k => chunkCss(k, seen)), ...(chunk.css ?? [])];
+  };
+  const caseKey = 'src/features/case-studies/CaseStudyPage.tsx';
+  if (!manifest[caseKey]) throw new Error(`${caseKey} missing from the Vite manifest`);
+  const caseCssFiles = [...new Set(chunkCss(caseKey))].filter(f => !inlined.has(path.basename(f)));
+  const caseStyles = (await Promise.all(caseCssFiles.map(f => inlineCss(`${BASE}${f}`)))).join('');
+  await rm(path.join(dist, '.vite'), { recursive: true, force: true });
   // Static-import preloads move into the boot script, so they too start after the first paint.
   const preloads = [...template.matchAll(/<link rel="modulepreload"[^>]*href="([^"]+)"[^>]*>/g)];
   for (const m of preloads) template = template.replace(m[0], '');
@@ -125,7 +164,11 @@ async function main() {
     const page = await renderPath(routePath, '');
     const file = path.join(dist, stripBase(routePath), 'index.html');
     await mkdir(path.dirname(file), { recursive: true });
-    await writeFile(file, fillTemplate(template, { html: page.html, meta: page.meta, routePath, fontPreload }));
+    const extraStyles = page.isCase ? caseStyles : '';
+    await writeFile(
+      file,
+      fillTemplate(template, { html: page.html, meta: page.meta, routePath, fontPreload, extraStyles }),
+    );
     if (page.meta.canonical) indexable.push(page.meta);
     console.log(`prerendered ${routePath}`);
   }
@@ -139,13 +182,13 @@ async function main() {
   );
   console.log('prerendered 404.html');
 
-  const today = new Date().toISOString().slice(0, 10);
+  const lastmod = contentDate();
   const urls = indexable
     .map(m => {
       const alts = m.alternates
         .map(a => `    <xhtml:link rel="alternate" hreflang="${a.hreflang}" href="${a.href}" />`)
         .join('\n');
-      return `  <url>\n    <loc>${m.canonical}</loc>\n    <lastmod>${today}</lastmod>\n${alts}\n  </url>`;
+      return `  <url>\n    <loc>${m.canonical}</loc>\n    <lastmod>${lastmod}</lastmod>\n${alts}\n  </url>`;
     })
     .join('\n');
   await writeFile(

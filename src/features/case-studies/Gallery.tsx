@@ -10,6 +10,10 @@ import { EASE } from '../../lib/motion-tokens';
 import { lockScroll } from '../../lib/scroll';
 import type { MediaItem } from '../../types/content';
 
+/** Elements that use ←/→ themselves. */
+const ARROW_KEY_CONTROLS =
+  'input, select, textarea, [contenteditable="true"], [role="slider"], [role="radio"], [role="tab"], [role="application"], [data-arrow-keys]';
+
 function MediaView({ item, large }: { item: MediaItem; large?: boolean }) {
   const { l } = useLocale();
   if (item.kind === 'visual') return <ProjectVisual kind={item.visual} compact={!large} />;
@@ -41,8 +45,11 @@ export function Gallery({ items }: { items: MediaItem[] }) {
     if (!open) return;
     const release = lockScroll();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') step(1);
-      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      // The media inside is interactive (simulator radios/sliders, the zoomable diagram): arrows used by a control
+      // belong to that control, not to the gallery.
+      if (e.defaultPrevented || (e.target instanceof Element && e.target.closest(ARROW_KEY_CONTROLS))) return;
+      step(e.key === 'ArrowRight' ? 1 : -1);
     };
     document.addEventListener('keydown', onKey);
     return () => {

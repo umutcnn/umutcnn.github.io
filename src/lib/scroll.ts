@@ -1,6 +1,9 @@
 import type Lenis from 'lenis';
 import { hasFinePointer, prefersReducedMotion } from './prefs';
 import { afterFirstInteraction, loadGsap } from './gsap';
+import { DURATION } from './motion-tokens';
+
+const SECTION_SCROLL_DURATION = DURATION.scroll;
 
 /**
  * Scrolling utilities. Native scroll is the baseline everywhere; Lenis smoothing is layered on top only for
@@ -11,25 +14,53 @@ let lenis: Lenis | null = null;
 /** Settles once a pending Lenis initialisation has finished (or failed); null when none is in flight. */
 let lenisSettling: Promise<void> | null = null;
 let lockCount = 0;
+/** Ref-counted shared instance: every caller gets a release function; the last release destroys Lenis. */
+let users = 0;
+let creating: Promise<void> | null = null;
+let teardown: (() => void) | null = null;
 
+function destroyIfUnused() {
+  if (users > 0 || !teardown) return;
+  teardown();
+  teardown = null;
+  creating = null;
+}
+
+/**
+ * Starts (or joins) the shared smooth scroller. Overlapping calls — e.g. React StrictMode mounting an effect twice —
+ * share one instance instead of creating a second one whose teardown would break the first.
+ */
 export function initSmoothScroll(): Promise<() => void> {
-  if (typeof window === 'undefined' || lenis || prefersReducedMotion() || !hasFinePointer())
-    return Promise.resolve(() => {});
-  const run = createSmoothScroll();
-  const settling = run.then(
-    () => {},
-    () => {},
-  );
-  lenisSettling = settling;
-  void settling.then(() => {
-    if (lenisSettling === settling) lenisSettling = null;
-  });
-  return run;
+  if (typeof window === 'undefined' || prefersReducedMotion() || !hasFinePointer()) return Promise.resolve(() => {});
+  users += 1;
+  if (!creating) {
+    const run = createSmoothScroll().then(
+      t => {
+        teardown = t;
+        destroyIfUnused();
+      },
+      () => {
+        if (creating === run) creating = null;
+      },
+    );
+    creating = run;
+    lenisSettling = run;
+    void run.then(() => {
+      if (lenisSettling === run) lenisSettling = null;
+    });
+  }
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    users -= 1;
+    destroyIfUnused();
+  };
+  return creating.then(() => release);
 }
 
 async function createSmoothScroll(): Promise<() => void> {
   await afterFirstInteraction();
-  if (lenis) return () => {};
   const [{ default: LenisCtor }, { gsap, ScrollTrigger }] = await Promise.all([import('lenis'), loadGsap()]);
   const instance = new LenisCtor({ lerp: 0.12, smoothWheel: true, anchors: false, autoRaf: false });
   lenis = instance;
@@ -49,7 +80,7 @@ export function scrollToElement(el: HTMLElement | null, opts: { immediate?: bool
   if (!el) return;
   const immediate = opts.immediate || prefersReducedMotion();
   if (lenis) {
-    lenis.scrollTo(el, { immediate, duration: 1.1 });
+    lenis.scrollTo(el, { immediate, duration: SECTION_SCROLL_DURATION });
     return;
   }
   if (lenisSettling && !immediate) {
@@ -69,9 +100,15 @@ export function scrollToId(id: string, opts: { immediate?: boolean } = {}): bool
   return true;
 }
 
-export function scrollToY(y: number): void {
-  if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
-  else window.scrollTo({ top: y, behavior: 'auto' });
+/** Instant by default (scroll restoration); `smooth` uses the same easing as section navigation. */
+export function scrollToY(y: number, opts: { smooth?: boolean } = {}): void {
+  const smooth = Boolean(opts.smooth) && !prefersReducedMotion();
+  if (lenis) {
+    // Restores run right after a page swap, before Lenis' ResizeObserver has seen the new document height: its
+    // cached scroll limit (of the previous, shorter page) would clamp the target. Re-measure first.
+    lenis.resize();
+    lenis.scrollTo(y, smooth ? { duration: SECTION_SCROLL_DURATION } : { immediate: true, force: true });
+  } else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
 }
 
 /** Ref-counted scroll lock for dialogs / the mobile menu. Preserves the scrollbar gutter to avoid layout shift. */

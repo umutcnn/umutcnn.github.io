@@ -69,8 +69,12 @@ export const PROFILE = {
 } as const;
 
 /** Real, countable facts used by the animated counters. Each one maps to verifiable content on the page. */
-export const FACTS: { value: number; suffix?: string; label: Localized }[] = [
-  { value: 2, suffix: '.', label: { tr: 'TEKNOFEST 2023 · Türkiye derecesi', en: 'TEKNOFEST 2023 · national rank' } },
+export const FACTS: { value: number; suffix?: Localized; label: Localized }[] = [
+  {
+    value: 2,
+    suffix: { tr: '.', en: 'nd' },
+    label: { tr: 'TEKNOFEST 2023 · Türkiye derecesi', en: 'TEKNOFEST 2023 · national rank' },
+  },
   { value: 3, label: { tr: 'TEKNOFEST 2024 finalist kategorisi', en: 'TEKNOFEST 2024 finalist categories' } },
   { value: 1, label: { tr: 'TÜBİTAK 2209-A araştırma projesi', en: 'TÜBİTAK 2209-A research project' } },
   { value: 5, label: { tr: 'Mühendislik rolü ve staj', en: 'Engineering roles & internships' } },

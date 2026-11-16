@@ -7,6 +7,8 @@ export const DURATION = {
   normal: 0.28,
   emphasis: 0.56,
   cinematic: 0.96,
+  /** programmatic smooth scroll to a section / project (Lenis `duration`) */
+  scroll: 1.1,
 } as const;
 
 export const EASE = {

@@ -84,6 +84,8 @@ export function ParticleField({
     let raf = 0;
     let running = false;
     let visible = true;
+    /** false until the idle callback below: observers may report visibility earlier but must not start the loop */
+    let idleReady = false;
     let last = performance.now();
     let time = 0;
     let exit = 0;
@@ -225,7 +227,7 @@ export function ParticleField({
     };
 
     const start = () => {
-      if (running || quality === 'minimal' || !visible || document.hidden) return;
+      if (running || !idleReady || quality === 'minimal' || !visible || document.hidden) return;
       running = true;
       last = performance.now();
       raf = requestAnimationFrame(frame);
@@ -279,7 +281,11 @@ export function ParticleField({
       cancelIdleCallback?: (h: number) => void;
     };
     const useIdle = typeof idleWin.requestIdleCallback === 'function';
-    const idleHandle = useIdle ? idleWin.requestIdleCallback!(start, { timeout: 900 }) : window.setTimeout(start, 250);
+    const begin = () => {
+      idleReady = true;
+      start();
+    };
+    const idleHandle = useIdle ? idleWin.requestIdleCallback!(begin, { timeout: 900 }) : window.setTimeout(begin, 250);
 
     return () => {
       stop();

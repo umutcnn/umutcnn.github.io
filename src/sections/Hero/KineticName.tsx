@@ -53,6 +53,8 @@ export const KineticName = forwardRef<KineticNameHandle, { name: string; lines: 
       let lastScroll = window.scrollY;
       let skew = 0;
       const tap = { x: 0, y: 0, until: 0 };
+      // The loop reads layout and writes 16 transforms per frame: run it only while the name is on screen.
+      let onScreen = true;
 
       const measure = () => {
         const box = el.getBoundingClientRect();
@@ -101,8 +103,9 @@ export const KineticName = forwardRef<KineticNameHandle, { name: string; lines: 
         raf = moving || near ? requestAnimationFrame(frame) : 0;
       };
       const wake = () => {
-        if (!raf) {
+        if (!raf && onScreen) {
           last = performance.now();
+          lastScroll = window.scrollY; // no velocity spike from scrolling done while asleep
           raf = requestAnimationFrame(frame);
         }
       };
@@ -117,6 +120,15 @@ export const KineticName = forwardRef<KineticNameHandle, { name: string; lines: 
       measure();
       const ro = new ResizeObserver(measure);
       ro.observe(el);
+      const io = new IntersectionObserver(([entry]) => {
+        onScreen = Boolean(entry?.isIntersecting);
+        if (onScreen) return;
+        cancelAnimationFrame(raf);
+        raf = 0;
+        skew = 0;
+        rows.forEach(r => (r.style.transform = ''));
+      });
+      io.observe(el);
       document.fonts?.ready.then(measure).catch(() => {});
       const onMove = () => wake();
       const onScroll = () => wake();
@@ -126,6 +138,7 @@ export const KineticName = forwardRef<KineticNameHandle, { name: string; lines: 
       return () => {
         cancelAnimationFrame(raf);
         ro.disconnect();
+        io.disconnect();
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('scroll', onScroll);
         release();

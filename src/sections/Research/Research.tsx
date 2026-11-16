@@ -3,6 +3,10 @@ import { useLocale } from '../../app/providers/LocaleProvider';
 import { Link, useRouter } from '../../app/providers/RouterProvider';
 import { Reveal } from '../../components/motion/Reveal';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { langTerm } from '../../components/ui/langTerm';
+
+/** Turkish name inside an upper-cased label: keep Turkish casing on the English page too. */
+const ADVISOR = 'Ekin Ekinci';
 import { ArchitectureGraph } from '../../components/visualizations/ArchitectureGraph';
 import './Research.css';
 
@@ -24,7 +28,7 @@ export function Research() {
         <div className="research__grid">
           <div className="research__main">
             <Reveal className="research__paper">
-              <p className="label">{r.meta}</p>
+              <p className="label">{langTerm(r.meta, ADVISOR, 'tr')}</p>
               <h3 className="research__paper-title">{r.projectTitle}</h3>
             </Reveal>
 

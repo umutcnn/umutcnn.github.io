@@ -3,6 +3,7 @@ import { useLocale } from '../../app/providers/LocaleProvider';
 import { LazyMount } from '../../components/motion/LazyMount';
 import { Reveal } from '../../components/motion/Reveal';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { useOverflowFade } from '../../hooks/useOverflowFade';
 import './Lab.css';
 
 const LabPanel = lazy(() => import('./LabPanels'));
@@ -14,6 +15,7 @@ const TABS: Tab[] = ['fl', 'cv', 'arch'];
 export function Lab() {
   const { t } = useLocale();
   const [tab, setTab] = useState<Tab>('fl');
+  const strip = useOverflowFade<HTMLDivElement>(tab);
   const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({ fl: null, cv: null, arch: null });
 
   const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
@@ -42,7 +44,7 @@ export function Lab() {
         <SectionHeader index={8} label={t.lab.label} title={t.lab.title} titleId="lab-title" intro={t.lab.intro} />
 
         <Reveal className="lab__shell">
-          <div className="lab__tabs" role="tablist" aria-label={t.lab.tablistLabel}>
+          <div ref={strip} className="lab__tabs scroll-fade" role="tablist" aria-label={t.lab.tablistLabel}>
             {TABS.map((id, i) => (
               <button
                 key={id}
