@@ -1,0 +1,149 @@
+/* Shell-level layout: progress bar, footer, 404, loading. */
+.scroll-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: calc(var(--z-nav) + 1);
+    height: 2px;
+    background: var(--c-signal);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    animation: progress-grow linear both;
+    animation-timeline: scroll(root block);
+    pointer-events: none;
+  }
+}
+@keyframes progress-grow {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+#main:focus {
+  outline: none;
+}
+
+.site-footer {
+  background: var(--bg);
+  color: var(--fg-muted);
+  border-top: 1px solid var(--border);
+}
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  padding-block: 1.75rem;
+}
+.site-footer__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--fg);
+}
+
+.not-found {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  background-color: var(--bg);
+  color: var(--fg);
+}
+.not-found__inner {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: start;
+  padding-block: calc(var(--nav-h) + 3rem) 4rem;
+}
+.not-found__code {
+  font-family: var(--font-mono);
+  font-size: clamp(5rem, 22vw, 16rem);
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--fg-muted);
+}
+
+.page-loading {
+  min-height: 100svh;
+}
+
+/* Grid children default to min-width:auto and can be forced wider than the viewport by long
+   unbreakable strings; let every two-column section shrink its columns instead. */
+.about__grid > *,
+.research__grid > *,
+.stack__grid > *,
+.journey__grid > *,
+.case__layout > *,
+.work-item > * {
+  min-width: 0;
+}
+.research__side > *,
+.about__side > * {
+  min-width: 0;
+}
+/* Long CTA labels wrap on narrow phones instead of widening their column. */
+@media (max-width: 480px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+    max-width: 100%;
+  }
+}
+
+.lazy-mount {
+  width: 100%;
+}
+
+.visual-loading {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-m);
+  background: linear-gradient(
+      100deg,
+      var(--bg-2) 30%,
+      color-mix(in oklab, var(--bg-2) 70%, var(--fg) 6%) 50%,
+      var(--bg-2) 70%
+    )
+    0 0 / 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------------------------------------------------------------- page transitions (View Transitions API) */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-group(vt-project-media),
+::view-transition-group(vt-project-title) {
+  animation-duration: 640ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(vt-project-media),
+::view-transition-new(vt-project-media) {
+  height: 100%;
+  object-fit: cover;
+  overflow: clip;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

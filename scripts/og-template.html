@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      @font-face {
+        font-family: 'SG';
+        src: url('../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-ext-wght-normal.woff2') format('woff2');
+        font-weight: 300 700;
+        unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+      @font-face {
+        font-family: 'SG';
+        src: url('../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2') format('woff2');
+        font-weight: 300 700;
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: 'JBM';
+        src: url('../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+        font-weight: 100 800;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        background: #090d18;
+        color: #e8ebf2;
+        font-family: 'SG', sans-serif;
+        overflow: hidden;
+      }
+      .wrap {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 56px 64px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-image:
+          linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+      .top,
+      .bottom {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'JBM', monospace;
+        font-size: 20px;
+        letter-spacing: 0.08em;
+        color: #9ba3b6;
+      }
+      h1 {
+        margin: 0;
+        font-size: 148px;
+        line-height: 0.88;
+        letter-spacing: -0.05em;
+        font-weight: 650;
+      }
+      h1 span {
+        display: block;
+        padding-left: 160px;
+      }
+      .dot {
+        color: #a4ff70;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: #a4ff70;
+        color: #0b1a02;
+        font-family: 'JBM', monospace;
+        font-weight: 700;
+        font-size: 18px;
+      }
+      svg {
+        position: absolute;
+        right: 40px;
+        top: 120px;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <svg width="360" height="300" viewBox="0 0 360 300" aria-hidden="true">
+        <g stroke="#e8ebf2" stroke-opacity="0.25">
+          <line x1="40" y1="60" x2="180" y2="150" /><line x1="40" y1="150" x2="180" y2="150" /><line x1="40" y1="240" x2="180" y2="150" />
+          <line x1="180" y1="150" x2="320" y2="150" />
+        </g>
+        <circle cx="40" cy="60" r="8" fill="#e8ebf2" /><circle cx="40" cy="150" r="8" fill="#e8ebf2" /><circle cx="40" cy="240" r="8" fill="#e8ebf2" />
+        <circle cx="180" cy="150" r="14" fill="#7776ff" /><circle cx="320" cy="150" r="10" fill="#a4ff70" />
+      </svg>
+      <div class="top"><span>UCY. / PORTFOLIO</span><span>BURSA, TÜRKİYE — 2026</span></div>
+      <div>
+        <h1>UMUT CAN<span>YILDIZ<span class="dot" style="display:inline;padding:0">.</span></span></h1>
+      </div>
+      <div class="bottom">
+        <span>AI ENGINEER · COMPUTER VISION · MACHINE LEARNING</span>
+        <span class="badge">TEKNOFEST 2023 — 2ND PLACE</span>
+      </div>
+    </div>
+  </body>
+</html>

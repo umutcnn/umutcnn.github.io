@@ -1,0 +1,304 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero:focus {
+  outline: none;
+}
+
+.hero__field {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-canvas);
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
+}
+.hero__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-out);
+}
+.hero__canvas.is-ready {
+  opacity: 1;
+}
+
+.hero__frame {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100svh;
+  padding-top: calc(var(--nav-h) + 1rem);
+  padding-bottom: clamp(1.5rem, 4vh, 2.75rem);
+  pointer-events: none;
+}
+.hero__frame a,
+.hero__frame button {
+  pointer-events: auto;
+}
+
+.hero__instrument {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.85rem;
+}
+
+.hero__center {
+  align-self: center;
+  padding-block: clamp(1rem, 4vh, 3rem);
+  transform-origin: 50% 40%;
+  will-change: transform, opacity;
+}
+
+.hero__role {
+  margin-bottom: clamp(0.75rem, 2vh, 1.5rem);
+  color: var(--fg-2);
+  max-width: 64ch;
+}
+
+.hero__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: var(--fs-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.hero__line {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.hero__line + .hero__line {
+  padding-left: clamp(0rem, 14vw, 18rem);
+}
+.hero__space {
+  display: inline-block;
+  width: 0.28em;
+}
+.hero__mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-block: 0.06em 0.02em;
+  margin-block: -0.06em -0.02em;
+}
+.hero__char {
+  display: inline-block;
+  animation: hero-char-in 1.05s var(--ease-out) backwards;
+  animation-delay: calc(120ms + var(--i) * 42ms);
+  transition:
+    transform var(--dur-emphasis) var(--ease-out),
+    color var(--dur-normal) var(--ease-out);
+}
+@keyframes hero-char-in {
+  from {
+    transform: translate3d(0, 108%, 0) rotate(4deg);
+  }
+}
+/* kinetic layer: KineticName writes transforms on .hero__mask / .hero__line (transform only) */
+.hero__line {
+  perspective: 700px;
+  transform-origin: 50% 100%;
+}
+.hero__mask {
+  will-change: transform;
+}
+.hero__mask.is-near .hero__char {
+  color: var(--accent-2);
+}
+
+.hero__tagline {
+  margin-top: clamp(1rem, 3vh, 2rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  max-width: 28ch;
+  animation: rise 1s var(--ease-out) 0.55s backwards;
+}
+@keyframes rise {
+  from {
+    transform: translate3d(0, 18px, 0);
+  }
+}
+
+.hero__bottom {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-areas: 'signals' 'lede' 'ctas';
+  align-items: end;
+  animation: rise 1s var(--ease-out) 0.75s backwards;
+}
+.hero__signals {
+  grid-area: signals;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hero__signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  padding-right: 0.25rem;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.hero__signal strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.hero__signal:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hero__signal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--c-violet);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--c-violet) 18%, transparent);
+  flex: none;
+}
+.hero__lede {
+  grid-area: lede;
+}
+.hero__ctas {
+  grid-area: ctas;
+}
+@media (min-width: 900px) {
+  .hero__bottom {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'signals ctas' 'lede ctas';
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+  }
+  .hero__ctas {
+    align-self: end;
+  }
+}
+
+.hero__award {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-self: start;
+  padding: 0.55rem 1rem 0.55rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: color-mix(in oklab, var(--bg) 80%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.hero__award:hover {
+  border-color: var(--fg);
+}
+.hero__award strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+.hero__award-sub {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+.hero__award-icon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: var(--c-signal);
+  color: #0b1a02;
+  flex: none;
+}
+
+.hero__lede {
+  max-width: 46ch;
+  color: var(--fg-2);
+  font-size: var(--fs-small);
+}
+
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.hero__scroll {
+  display: none;
+}
+@media (min-width: 900px) and (min-height: 720px) {
+  .hero__scroll {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 50%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    writing-mode: vertical-rl;
+    transform: translate(-30%, 50%) rotate(180deg);
+    font-size: 0.68rem;
+  }
+  .hero__scroll-line {
+    width: 1px;
+    height: 3.5rem;
+    background: linear-gradient(var(--fg-muted), transparent);
+    animation: scroll-cue 2.4s var(--ease-in-out) infinite;
+  }
+}
+@keyframes scroll-cue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero__instrument .label {
+    font-size: 0.66rem;
+  }
+  .hero__ctas .magnetic {
+    flex: 1 1 auto;
+  }
+  .hero__ctas .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero__name {
+    font-size: 17vw;
+  }
+}

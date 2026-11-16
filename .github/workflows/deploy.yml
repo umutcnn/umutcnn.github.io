@@ -1,0 +1,87 @@
+# Builds, tests and deploys the portfolio to GitHub Pages.
+#
+# Repository: umutcnn/umutcnn  →  published at https://umutcnn.github.io/umutcnn/
+# The base path is derived from the repository name, so the same file also works for a user-site repository
+# named `umutcnn.github.io` (base "/") or any other name (base "/<name>/").
+#
+# One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# The repository root must be this project folder (the one containing package.json).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check, lint, unit + integration tests
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+
+      # E2E runs against a root ("/") build served by `vite preview` — the tests address pages as "/…".
+      - name: Build for tests
+        run: npm run build
+
+      - name: End-to-end + accessibility tests (Chromium)
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright test tests/e2e tests/accessibility
+        # Visual baselines are rendered on Windows (font rasterisation differs on Linux), so they run locally only.
+        env:
+          CI: 'true'
+
+      - name: Resolve base path from the repository name
+        id: base
+        run: |
+          name="${{ github.event.repository.name }}"
+          if [[ "$name" == *.github.io ]]; then echo "path=/" >> "$GITHUB_OUTPUT"; else echo "path=/$name/" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Build for GitHub Pages (base ${{ steps.base.outputs.path }})
+        run: npm run build
+        env:
+          VITE_BASE: ${{ steps.base.outputs.path }}
+
+      - name: Check the published build uses the base path
+        run: |
+          grep -q "data-route=\"${{ steps.base.outputs.path }}\"" dist/index.html
+          grep -q "rel=\"canonical\" href=\"https://umutcnn.github.io${{ steps.base.outputs.path }}\"" dist/index.html
+          test -f dist/404.html && test -f dist/sitemap.xml
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

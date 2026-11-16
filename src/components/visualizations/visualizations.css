@@ -1,0 +1,896 @@
+/* ============================================================== shared viz chrome */
+.viz {
+  display: grid;
+  gap: 1rem;
+  color: var(--fg);
+}
+.viz svg:not(.lucide) {
+  width: 100%;
+  height: auto;
+}
+.viz__canvas {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background: var(--bg-2);
+}
+.viz--compact svg {
+  border-radius: var(--radius-m);
+}
+.viz__status {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+.viz__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.5rem;
+}
+.viz__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.viz__buttons .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.viz__notes {
+  display: grid;
+  gap: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+@media (min-width: 720px) {
+  .viz__notes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.viz__fine {
+  font-size: 0.875rem;
+  color: var(--fg-2);
+  margin-top: 0.4rem;
+  max-width: 62ch;
+}
+.viz__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 0;
+}
+.viz__stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.segmented legend {
+  width: 100%;
+  margin-bottom: 0.45rem;
+  padding: 0;
+}
+.segmented label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+.segmented label:hover {
+  border-color: var(--border-strong);
+}
+.segmented label.is-on {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+.segmented input,
+.toggles input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.segmented label:has(input:focus-visible),
+.toggle:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.range {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 12rem;
+}
+.range--wide {
+  flex: 1 1 18rem;
+}
+.range output {
+  color: var(--fg);
+  font-weight: 700;
+}
+.range input[type='range'] {
+  width: 100%;
+  accent-color: var(--c-signal);
+  min-height: 2rem;
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.toggles legend {
+  width: 100%;
+  margin-bottom: 0.45rem;
+  padding: 0;
+}
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.toggle.is-on {
+  opacity: 1;
+  border-color: var(--border-strong);
+}
+.toggle__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 99px;
+}
+.toggle__swatch--camera {
+  background: var(--c-violet);
+}
+.toggle__swatch--lidar {
+  background: #58d6ff;
+}
+.toggle__swatch--detection {
+  background: var(--c-warn);
+}
+.toggle__swatch--route {
+  background: var(--c-signal);
+}
+
+.meter {
+  position: relative;
+  height: 6px;
+  margin-top: 0.6rem;
+  border-radius: 99px;
+  background: var(--border);
+  overflow: hidden;
+}
+.meter span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--c-violet), var(--c-signal));
+  transform-origin: 0 50%;
+  transition: transform var(--dur-emphasis) var(--ease-out);
+}
+
+/* ============================================================== federated */
+.fl-svg {
+  --fl-ink: var(--fg);
+  font-family: var(--font-mono);
+}
+.fl-link {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+}
+.phase-upload .fl-link,
+.phase-broadcast .fl-link {
+  stroke: color-mix(in oklab, var(--c-violet) 70%, transparent);
+  animation: dash 1s linear infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.fl-client__box {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  transition: stroke var(--dur-normal) var(--ease-out);
+}
+.phase-train .fl-client__box {
+  stroke: var(--c-signal);
+  stroke-width: 1.5;
+}
+.fl-bar {
+  fill: color-mix(in oklab, var(--fg) 70%, transparent);
+  transition:
+    y var(--dur-emphasis) var(--ease-out),
+    height var(--dur-emphasis) var(--ease-out),
+    fill var(--dur-normal) var(--ease-out);
+}
+.phase-train .fl-bar {
+  fill: var(--c-signal);
+}
+.fl-lock {
+  fill: var(--c-violet);
+}
+.fl-text-label {
+  fill: var(--fg-muted);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.fl-text-title {
+  fill: var(--fg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+}
+.fl-server__ring {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-dasharray: 3 7;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.phase-aggregate .fl-server__ring {
+  stroke: var(--c-violet);
+  animation: spin 2.4s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fl-server__core {
+  fill: color-mix(in oklab, var(--c-violet) 22%, var(--surface));
+  stroke: var(--c-violet);
+}
+.fl-global__ring {
+  fill: color-mix(in oklab, var(--c-signal) 14%, var(--surface));
+  stroke: var(--c-signal);
+  stroke-width: 1.5;
+  transition: fill var(--dur-normal) var(--ease-out);
+}
+.phase-broadcast .fl-global__ring {
+  fill: color-mix(in oklab, var(--c-signal) 35%, var(--surface));
+}
+.fl-packet--up {
+  fill: var(--c-violet);
+}
+.fl-packet--down {
+  fill: var(--c-signal);
+}
+.fl-rail {
+  fill: var(--border);
+  transition: fill var(--dur-normal) var(--ease-out);
+}
+.fl-rail.is-on {
+  fill: var(--c-signal);
+}
+
+/* ============================================================== coil detection */
+.det-svg {
+  font-family: var(--font-mono);
+}
+.det-bg-top {
+  stop-color: #1c2232;
+}
+.det-bg-bottom {
+  stop-color: #2a3042;
+}
+.det-grid {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.04);
+}
+.det-pallet {
+  fill: #3a3326;
+}
+.coil__outer {
+  fill: #8d939f;
+  stroke: #5d626c;
+  stroke-width: 2;
+}
+.coil__wind {
+  fill: none;
+  stroke: #6d727c;
+  stroke-width: 1.5;
+}
+.coil__core {
+  fill: #b9a57a;
+  stroke: #8d7c58;
+}
+.coil__hole {
+  fill: #12151d;
+}
+.det-box rect:first-child {
+  fill: rgb(164 255 112 / 0.08);
+  stroke: var(--c-signal);
+  stroke-width: 2;
+}
+.det-box--partial rect:first-child {
+  fill: rgb(255 181 71 / 0.08);
+  stroke: var(--c-warn);
+}
+.det-box.is-fp rect:first-child {
+  stroke: #ff6b6b;
+  fill: rgb(255 107 107 / 0.08);
+  stroke-dasharray: 5 4;
+}
+.det-tag {
+  fill: var(--c-signal);
+}
+.det-box--partial .det-tag {
+  fill: var(--c-warn);
+}
+.det-box.is-fp .det-tag {
+  fill: #ff6b6b;
+}
+.det-tag__text {
+  fill: #0b1a02;
+  font-size: 10px;
+  font-weight: 700;
+}
+.det-hud__text {
+  fill: #e8ebf2;
+  font-size: 12px;
+}
+
+/* ============================================================== aerial */
+.aerial-svg {
+  font-family: var(--font-mono);
+  --ground: #5f6f4b;
+  --road: #4a4d55;
+  --roof: #9a8f80;
+  transition: filter var(--dur-emphasis) var(--ease-out);
+}
+.aerial-svg.is-night {
+  filter: brightness(0.42) saturate(0.6) hue-rotate(190deg);
+}
+.aerial-svg.is-night .aerial-dets {
+  filter: brightness(2.4) hue-rotate(-190deg) saturate(1.6);
+}
+.aerial-ground {
+  fill: var(--ground);
+}
+.aerial-grain {
+  fill: rgb(0 0 0 / 0.12);
+}
+.aerial-road {
+  fill: var(--road);
+}
+.aerial-lane {
+  stroke: #e9e4c8;
+  stroke-width: 2;
+  stroke-dasharray: 14 12;
+}
+.aerial-roof {
+  fill: var(--roof);
+  stroke: rgb(0 0 0 / 0.25);
+}
+.aerial-pad {
+  fill: #2f3a2a;
+  stroke: #e9e4c8;
+  stroke-width: 3;
+}
+.aerial-pad__h {
+  fill: #e9e4c8;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+}
+.aerial-car {
+  fill: #c9ced8;
+  stroke: #2a2d34;
+}
+.aerial-person {
+  fill: #ffd27a;
+  stroke: #2a2d34;
+}
+.aerial-vignette {
+  stop-color: #000;
+  stop-opacity: 0.7;
+}
+.aerial-det rect {
+  fill: none;
+  stroke: var(--c-signal);
+  stroke-width: 2;
+}
+.aerial-det text {
+  fill: var(--c-signal);
+  font-size: 10px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgb(0 0 0 / 0.6);
+  stroke-width: 3px;
+}
+.aerial-det--person rect {
+  stroke: var(--c-warn);
+}
+.aerial-det--person text {
+  fill: var(--c-warn);
+}
+.aerial-det--pad-ok rect {
+  stroke: #58d6ff;
+  stroke-dasharray: 6 4;
+}
+.aerial-det--pad-ok text {
+  fill: #58d6ff;
+}
+.aerial-det--pad-blocked rect {
+  stroke: #ff6b6b;
+  stroke-dasharray: 6 4;
+}
+.aerial-det--pad-blocked text {
+  fill: #ff6b6b;
+}
+.aerial-det {
+  animation: det-pop var(--dur-emphasis) var(--ease-out) backwards;
+}
+@keyframes det-pop {
+  from {
+    opacity: 0;
+  }
+}
+.aerial-scan {
+  fill: var(--c-signal);
+  opacity: 0.55;
+  animation: scan 4.5s var(--ease-in-out) infinite;
+}
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(377px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================== robotaxi */
+.taxi-svg {
+  font-family: var(--font-mono);
+}
+.taxi-sky-top {
+  stop-color: #0c1222;
+}
+.taxi-sky-bottom {
+  stop-color: #253049;
+}
+.taxi-ground {
+  fill: #141a28;
+}
+.taxi-road {
+  fill: #232a3b;
+}
+.taxi-lane {
+  stroke: #e9e4c8;
+  stroke-width: 2;
+  stroke-dasharray: 12 14;
+  opacity: 0.6;
+}
+.taxi-edge {
+  stroke: #e9e4c8;
+  stroke-width: 2;
+  opacity: 0.35;
+}
+.taxi-obj {
+  fill: #59627a;
+}
+.taxi-sign {
+  fill: #c74747;
+}
+.taxi-pole {
+  stroke: #59627a;
+  stroke-width: 3;
+}
+.taxi-fov-a {
+  stop-color: #7776ff;
+  stop-opacity: 0.32;
+}
+.taxi-fov-b {
+  stop-color: #7776ff;
+  stop-opacity: 0;
+}
+.taxi-lidar path {
+  fill: none;
+  stroke-linecap: round;
+}
+.taxi-lidar__free {
+  stroke: #58d6ff;
+  stroke-width: 2.2;
+  opacity: 0.55;
+}
+.taxi-lidar__hit {
+  stroke: #ffffff;
+  stroke-width: 3.8;
+  opacity: 0.95;
+}
+.taxi-route path {
+  fill: none;
+  stroke: var(--c-signal);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 2 10;
+  animation: dash 0.9s linear infinite;
+}
+.taxi-dets rect {
+  fill: none;
+  stroke: var(--c-warn);
+  stroke-width: 2;
+}
+.taxi-dets text {
+  fill: var(--c-warn);
+  font-size: 10px;
+  font-weight: 700;
+}
+.taxi-ego {
+  fill: #e8ebf2;
+}
+
+/* ============================================================== CAD */
+.cad-svg {
+  background:
+    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 20px 20px,
+    #0b1020;
+  border-radius: var(--radius-m);
+  font-family: var(--font-mono);
+}
+.cad-wire {
+  fill: none;
+  stroke: #9fd8ff;
+  stroke-width: 1;
+  opacity: 0.9;
+}
+.cad-bbox {
+  fill: none;
+  stroke: var(--c-signal);
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+  opacity: 0.75;
+}
+.cad-dims rect {
+  fill: rgb(164 255 112 / 0.1);
+  stroke: rgb(164 255 112 / 0.5);
+}
+.cad-dims text {
+  fill: var(--c-signal);
+  font-size: 10.5px;
+}
+.cad-axes line {
+  stroke: rgb(255 255 255 / 0.4);
+}
+.cad-axes text {
+  fill: rgb(255 255 255 / 0.5);
+  font-size: 10px;
+}
+
+/* ============================================================== architecture graph */
+.arch {
+  container-type: inline-size;
+  display: grid;
+  gap: 1rem;
+}
+.arch__stage {
+  position: relative;
+  aspect-ratio: 100 / 60;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background:
+    radial-gradient(circle at 1px 1px, var(--grid-line) 1px, transparent 0) 0 0 / 18px 18px,
+    var(--bg-2);
+}
+.arch--compact .arch__stage {
+  border: 0;
+  background: transparent;
+}
+.arch__edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.arch__edge {
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  animation: arch-flow 1.6s linear infinite;
+  transition: stroke var(--dur-normal) var(--ease-out);
+}
+.arch__edge.is-on {
+  stroke: var(--c-signal);
+  stroke-width: 2;
+  animation-duration: 0.7s;
+}
+/* data flows along the arrows */
+@keyframes arch-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.arch__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+.arch__zoom {
+  margin-right: auto;
+}
+.arch__toolbar .icon-btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.arch__stage {
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.arch--compact .arch__stage {
+  cursor: default;
+}
+.arch__stage.is-dragging {
+  cursor: grabbing;
+}
+.arch__viewport {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+.arch__edge-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--bg-2);
+  font-size: 0.62rem;
+  pointer-events: none;
+}
+.arch__node.is-preview {
+  border-color: var(--fg);
+}
+.arch__arrow {
+  fill: var(--fg-muted);
+}
+.arch__node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  max-width: 24%;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: clamp(0.62rem, 1.4cqi, 0.8rem);
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-normal) var(--ease-out);
+}
+.arch__node:hover {
+  transform: translate(-50%, -50%) scale(1.04);
+}
+.arch__node::before,
+.arch__list-btn::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 0.4rem;
+  border-radius: 99px;
+  background: var(--tone, var(--fg-muted));
+  vertical-align: middle;
+}
+.arch__node--client {
+  --tone: #58d6ff;
+}
+.arch__node--core {
+  --tone: var(--c-violet);
+}
+.arch__node--data {
+  --tone: var(--c-warn);
+}
+.arch__node--ai {
+  --tone: var(--c-signal);
+}
+.arch__node--ui {
+  --tone: #ff8fd0;
+}
+.arch__node.is-selected,
+.arch__list-btn.is-selected {
+  border-color: var(--c-signal);
+  background: color-mix(in oklab, var(--c-signal) 14%, var(--surface));
+}
+.arch__list {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.4rem;
+}
+.arch__list-btn {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  text-align: left;
+}
+.arch__list li + li::before {
+  content: '↓';
+  display: block;
+  margin: 0.1rem 0 0.2rem 0.9rem;
+  color: var(--fg-muted);
+  font-size: 0.75rem;
+}
+@container (max-width: 560px) {
+  .arch:not(.arch--compact) .arch__stage {
+    display: none;
+  }
+  .arch__list {
+    display: grid;
+  }
+}
+.arch__detail {
+  min-height: 5.5rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.arch__detail-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+/* permission matrix */
+.perm {
+  /* positioned so the absolutely positioned .sr-only cells stay inside the scroll container */
+  position: relative;
+  overflow-x: auto;
+}
+.perm table {
+  width: 100%;
+  min-width: 460px;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.perm caption {
+  text-align: left;
+  margin-bottom: 0.75rem;
+}
+.perm th,
+.perm td {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.perm th[scope='row'] {
+  text-align: left;
+  font-weight: 600;
+}
+.perm thead th {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.perm .is-ok {
+  color: var(--accent-text);
+}
+.perm .is-no {
+  color: var(--fg-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aerial-scan {
+    display: none;
+  }
+}
+
+/* FL V2: phase explanation + client inspection */
+.fl-client.is-inspected .fl-client__box {
+  stroke: var(--c-violet);
+  stroke-width: 2.5;
+}
+.fl-explain {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.fl-explain__text {
+  font-size: 0.95rem;
+  color: var(--fg);
+  margin-bottom: 0.4rem;
+}
+.fl-explain__rule {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--accent-text);
+}
+.fl-inspect {
+  display: grid;
+  gap: 0.75rem;
+}
+.fl-inspect__card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-m);
+  border: 1px dashed var(--border-strong);
+}
+.fl-inspect__card dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.fl-inspect .viz__fine {
+  margin: 0;
+}
+
+.viz__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+.toggle__swatch--coil {
+  background: var(--c-signal);
+}
+.toggle__swatch--partial {
+  background: var(--c-warn);
+}

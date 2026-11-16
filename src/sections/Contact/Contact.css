@@ -1,0 +1,120 @@
+.contact {
+  padding-bottom: 0;
+  overflow: hidden;
+}
+.contact__title {
+  margin-top: 1.25rem;
+  font-size: var(--fs-display);
+  line-height: 0.98;
+  letter-spacing: var(--tracking-display);
+  max-width: 16ch;
+}
+.contact__intro {
+  margin-top: 1.5rem;
+}
+.contact__primary {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: clamp(2.5rem, 6vw, 4.5rem);
+  padding-block: 2rem;
+  border-block: 1px solid var(--border);
+}
+@media (min-width: 900px) {
+  .contact__primary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+.contact__email {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 4.4vw, 3.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  background: linear-gradient(var(--c-signal), var(--c-signal)) 0 92% / 0 0.12em no-repeat;
+  transition: background-size var(--dur-emphasis) var(--ease-out);
+}
+.contact__email:hover {
+  background-size: 100% 0.12em;
+}
+.contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.contact__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.contact-row__link {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  grid-template-areas: 'icon label arrow' 'icon value arrow';
+  align-items: center;
+  column-gap: 1rem;
+  min-height: 4.5rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: padding var(--dur-normal) var(--ease-out);
+}
+@media (min-width: 720px) {
+  .contact-row__link {
+    grid-template-columns: 2.5rem 12rem minmax(0, 1fr) auto;
+    grid-template-areas: 'icon label value arrow';
+  }
+}
+.contact-row__link:hover {
+  padding-left: 0.75rem;
+}
+.contact-row__icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+}
+.contact-row__label {
+  grid-area: label;
+}
+.contact-row__value {
+  grid-area: value;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+}
+.contact-row__arrow {
+  grid-area: arrow;
+  transition: transform var(--dur-normal) var(--ease-out);
+}
+.contact-row__link:hover .contact-row__arrow {
+  transform: translate(3px, -3px);
+}
+
+.contact__monogram {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-top: clamp(4rem, 9vw, 7rem);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(7rem, 34vw, 32rem);
+  line-height: 0.74;
+  letter-spacing: -0.07em;
+  color: var(--fg);
+  user-select: none;
+  overflow: hidden;
+}
+.contact__monogram span {
+  background: linear-gradient(180deg, var(--fg) 30%, color-mix(in oklab, var(--fg) 15%, var(--bg)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.contact__monogram i {
+  font-style: normal;
+  color: var(--c-signal);
+}

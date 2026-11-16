@@ -1,0 +1,135 @@
+/* ==========================================================================
+   Design tokens — "Engineering Intelligence" lab identity.
+   Raw palette → semantic surface tokens (.tone-paper / .tone-night).
+   Documented in docs/design-system.md.
+   ========================================================================== */
+:root {
+  /* Raw palette */
+  --c-paper: #f5f4f0;
+  --c-paper-2: #ebe9e3;
+  --c-surface: #ffffff;
+  --c-ink: #111318;
+  --c-ink-2: #2b2f38;
+  --c-muted: #5c616b; /* darkened from #707580 → 5.6:1 on paper (AA) */
+  --c-night: #090d18;
+  --c-night-2: #0e1424;
+  --c-night-3: #151d33;
+  --c-night-text: #e8ebf2;
+  --c-night-muted: #9ba3b6; /* 7.4:1 on night */
+  --c-signal: #a4ff70; /* electric accent — fills, dots, active states (never small text on paper) */
+  --c-signal-ink: #2f6a12; /* lime family, AA as text on paper */
+  --c-violet: #7776ff;
+  --c-violet-ink: #4744d4; /* AA as text on paper */
+  --c-violet-soft: #a9a8ff;
+  --c-warn: #ffb547;
+
+  /* Typography */
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    'Inter Variable', 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-hero: clamp(3.1rem, 14.6vw, 15.5rem);
+  --fs-display: clamp(2.35rem, 6.2vw, 6rem);
+  --fs-h2: clamp(2rem, 4.4vw, 4rem);
+  --fs-h3: clamp(1.35rem, 2.1vw, 1.9rem);
+  --fs-lead: clamp(1.1rem, 1.55vw, 1.4rem);
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9375rem;
+  --fs-label: 0.75rem;
+
+  --lh-tight: 0.9;
+  --lh-snug: 1.12;
+  --lh-body: 1.6;
+  --tracking-display: -0.045em;
+  --tracking-label: 0.09em;
+
+  /* Spacing & layout */
+  --gutter: clamp(1rem, 4.2vw, 3.5rem);
+  --section-y: clamp(5.5rem, 11vw, 10.5rem);
+  --maxw: 1480px;
+  --nav-h: 4.25rem;
+  --radius-s: 6px;
+  --radius-m: 14px;
+  --radius-l: 26px;
+
+  /* Motion (mirrors src/lib/motion-tokens.ts) */
+  --dur-fast: 150ms;
+  --dur-normal: 280ms;
+  --dur-emphasis: 560ms;
+  --dur-cinematic: 960ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --z-canvas: 0;
+  --z-content: 1;
+  --z-nav: 50;
+  --z-menu: 80;
+  --z-dialog: 90;
+  --z-toast: 100;
+}
+
+/* Paper surface (light theme default) */
+:root,
+.tone-paper {
+  --bg: var(--c-paper);
+  --bg-2: var(--c-paper-2);
+  --surface: var(--c-surface);
+  --fg: var(--c-ink);
+  --fg-2: var(--c-ink-2);
+  --fg-muted: var(--c-muted);
+  --border: rgb(17 19 24 / 0.12);
+  --border-strong: rgb(17 19 24 / 0.26);
+  --grid-line: rgb(17 19 24 / 0.055);
+  --accent: var(--c-signal);
+  --accent-text: var(--c-signal-ink);
+  --accent-2: var(--c-violet);
+  --accent-2-text: var(--c-violet-ink);
+  --on-accent: #0b1a02;
+  --focus: var(--c-violet-ink);
+  --shadow-1: 0 1px 0 rgb(17 19 24 / 0.04), 0 12px 32px -18px rgb(17 19 24 / 0.28);
+}
+
+/* Night surface — cinematic sections in both themes */
+.tone-night {
+  --bg: var(--c-night);
+  --bg-2: var(--c-night-2);
+  --surface: var(--c-night-3);
+  --fg: var(--c-night-text);
+  --fg-2: #c7cdda;
+  --fg-muted: var(--c-night-muted);
+  --border: rgb(255 255 255 / 0.1);
+  --border-strong: rgb(255 255 255 / 0.22);
+  --grid-line: rgb(255 255 255 / 0.045);
+  --accent: var(--c-signal);
+  --accent-text: var(--c-signal);
+  --accent-2: var(--c-violet);
+  --accent-2-text: var(--c-violet-soft);
+  --on-accent: #0b1a02;
+  --focus: var(--c-signal);
+  --shadow-1: 0 24px 60px -30px rgb(0 0 0 / 0.8);
+}
+
+/* Dark theme: paper surfaces become graphite; night sections deepen to keep the light/dark story. */
+:root[data-theme='dark'],
+:root[data-theme='dark'] .tone-paper {
+  --bg: #0d111b;
+  --bg-2: #131927;
+  --surface: #161d2c;
+  --fg: #eceef4;
+  --fg-2: #c9cedb;
+  --fg-muted: #a1a8b9;
+  --border: rgb(255 255 255 / 0.1);
+  --border-strong: rgb(255 255 255 / 0.22);
+  --grid-line: rgb(255 255 255 / 0.04);
+  --accent-text: var(--c-signal);
+  --accent-2-text: var(--c-violet-soft);
+  --focus: var(--c-signal);
+  --shadow-1: 0 24px 60px -30px rgb(0 0 0 / 0.85);
+}
+
+:root[data-theme='dark'] .tone-night {
+  --bg: #04060c;
+  --bg-2: #0a0f1c;
+  --surface: #111829;
+}

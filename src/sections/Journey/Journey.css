@@ -1,0 +1,113 @@
+.journey {
+  background: var(--bg-2);
+}
+.journey__grid {
+  display: grid;
+  gap: 3rem;
+}
+@media (min-width: 960px) {
+  .journey__grid {
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(3rem, 6vw, 6rem);
+  }
+}
+.journey__col-title {
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+.timeline {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.5rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: var(--border-strong);
+}
+.tl-entry {
+  position: relative;
+  padding-bottom: 2rem;
+}
+.tl-entry::before {
+  content: '';
+  position: absolute;
+  left: calc(-1.5rem + 0px);
+  top: 0.35rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--fg);
+}
+.tl-entry.is-ongoing::before {
+  background: var(--c-signal);
+  border-color: var(--c-signal);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--c-signal) 25%, transparent);
+}
+.tl-entry__role {
+  margin-top: 0.35rem;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+.tl-entry__org {
+  margin-top: 0.15rem;
+  color: var(--fg-muted);
+  font-size: 0.92rem;
+}
+.tl-entry__points {
+  margin: 0.65rem 0 0;
+  padding-left: 1.05rem;
+  display: grid;
+  gap: 0.3rem;
+  color: var(--fg-2);
+  font-size: 0.92rem;
+  max-width: 64ch;
+}
+
+.certs {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.certs__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.75rem 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font-size: 0.92rem;
+  text-align: left;
+}
+.certs__toggle svg {
+  transition: transform var(--dur-normal) var(--ease-out);
+}
+.certs__toggle svg.is-flipped {
+  transform: rotate(180deg);
+}
+.certs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.certs__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-top: 1px dashed var(--border);
+  font-size: 0.9rem;
+}
+.certs__list .label {
+  flex: none;
+  font-size: 0.66rem;
+}

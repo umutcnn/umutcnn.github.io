@@ -1,0 +1,195 @@
+.achievements {
+  background: radial-gradient(50% 50% at 10% 100%, rgb(164 255 112 / 0.08), transparent 70%), var(--bg);
+}
+
+/* ---------------------------------------------------------------- tabs */
+.story__tabs {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(11rem, 1fr);
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-top: 1px solid var(--border);
+}
+.story__tab {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+  min-height: 4.5rem;
+  padding: 1rem 1.25rem 1.1rem 0;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  text-align: left;
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.story__tab:hover,
+.story__tab.is-on {
+  color: var(--fg);
+}
+.story__tab-year {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
+.story__tab.is-on .story__tab-year {
+  color: var(--c-signal);
+}
+.story__tab-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.story__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+}
+.story__rail span {
+  position: absolute;
+  inset: 0;
+  background: var(--c-signal);
+  transform-origin: 0 50%;
+  transition: transform var(--dur-cinematic) var(--ease-out);
+}
+
+/* ---------------------------------------------------------------- chapter */
+.story__panel {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding-top: clamp(2rem, 5vw, 3.5rem);
+}
+@media (min-width: 960px) {
+  .story__panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: center;
+  }
+}
+.story__visual {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+}
+.story__year {
+  display: flex;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(5rem, 15vw, 12rem);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  overflow: hidden;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.45);
+}
+.story__panel.is-highlight .story__year {
+  color: var(--c-signal);
+  -webkit-text-stroke-color: transparent;
+}
+.story__year span {
+  display: inline-block;
+  animation: digit-roll var(--dur-cinematic) var(--ease-out) backwards;
+}
+@keyframes digit-roll {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+.story__glyph {
+  max-width: 320px;
+  animation: chapter-in var(--dur-emphasis) var(--ease-out) backwards 120ms;
+}
+.story__body {
+  display: grid;
+  gap: 1rem;
+  animation: chapter-in var(--dur-emphasis) var(--ease-out) backwards 80ms;
+}
+@keyframes chapter-in {
+  from {
+    transform: translate3d(0, 18px, 0);
+  }
+}
+.story__rank {
+  font-size: clamp(2rem, 4.2vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+.story__summary {
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  max-width: 50ch;
+}
+.story__details {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+  color: var(--fg-2);
+  max-width: 62ch;
+}
+.story__details li::marker {
+  color: var(--c-signal);
+}
+.story__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.story__links .btn {
+  white-space: normal;
+  text-align: left;
+}
+
+/* ---------------------------------------------------------------- glyphs (abstract, concept-matched) */
+.glyph {
+  width: 100%;
+  height: auto;
+}
+.glyph__muted {
+  fill: rgb(255 255 255 / 0.08);
+  stroke: rgb(255 255 255 / 0.25);
+}
+.glyph__lit {
+  fill: var(--c-signal);
+  animation: glyph-pop var(--dur-emphasis) var(--ease-out) backwards;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.glyph__violet {
+  fill: var(--c-violet);
+}
+.glyph__line {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.35);
+  stroke-width: 1.5;
+}
+.glyph__flow {
+  stroke: var(--c-signal);
+  stroke-dasharray: 4 6;
+  animation: glyph-flow 1.2s linear infinite;
+}
+.glyph__num {
+  fill: #0b1a02;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+}
+@keyframes glyph-pop {
+  from {
+    transform: scaleY(0.2);
+  }
+}
+@keyframes glyph-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glyph__flow {
+    animation: none;
+  }
+}
